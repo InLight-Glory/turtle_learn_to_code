@@ -183,3 +183,16 @@ nav ul li a {
 nav ul li a:hover {
     color: #2980b9;
 }
+
+/* DOM Turtle Styles */
+#canvas-wrapper {
+    position: relative;
+}
+
+#turtle-icon {
+    position: absolute;
+    font-size: 24px;
+    /* Center the icon on its coordinates */
+    transform: translate(-50%, -50%);
+    transition: top 0.1s linear, left 0.1s linear, transform 0.1s linear;
+}
