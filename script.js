@@ -3,15 +3,13 @@ console.log("Welcome to the Coding Challenge site!");
 // --- State Management ---
 const state = {
     turtle: {
-        x: 200,
-        y: 200,
-        angle: -90, // Start facing up
+        x: 0,
+        y: 0,
+        angle: 0,
         penDown: true,
     },
     lines: [],
-    challenge: {
-        target: { x: 200, y: 100, radius: 10 }
-    }
+    currentChallenge: null
 };
 
 let ctx; // Canvas 2D context
@@ -19,7 +17,7 @@ let turtleIcon;
 
 // --- Render Engine ---
 function render() {
-    if (!ctx || !turtleIcon) return;
+    if (!ctx || !turtleIcon || !state.currentChallenge) return;
 
     // Clear canvas
     const canvas = document.getElementById('turtle-canvas');
@@ -28,8 +26,9 @@ function render() {
     }
 
     // Draw challenge target
+    const target = state.currentChallenge.target;
     ctx.beginPath();
-    ctx.arc(state.challenge.target.x, state.challenge.target.y, state.challenge.target.radius, 0, 2 * Math.PI);
+    ctx.arc(target.x, target.y, target.radius, 0, 2 * Math.PI);
     ctx.fillStyle = 'yellow';
     ctx.fill();
     ctx.strokeStyle = 'orange';
@@ -52,9 +51,11 @@ function render() {
 
 // --- State & Movement Logic ---
 function reset() {
-    state.turtle.x = 200;
-    state.turtle.y = 200;
-    state.turtle.angle = -90;
+    if (!state.currentChallenge) return;
+    const start = state.currentChallenge.startPosition;
+    state.turtle.x = start.x;
+    state.turtle.y = start.y;
+    state.turtle.angle = start.angle;
     state.lines = [];
     render();
 }
@@ -77,16 +78,35 @@ function turn(degrees) {
 }
 
 function checkWinCondition() {
+    if (!state.currentChallenge) return;
+    const target = state.currentChallenge.target;
     const distance = Math.sqrt(
-        Math.pow(state.turtle.x - state.challenge.target.x, 2) +
-        Math.pow(state.turtle.y - state.challenge.target.y, 2)
+        Math.pow(state.turtle.x - target.x, 2) +
+        Math.pow(state.turtle.y - target.y, 2)
     );
 
-    if (distance < state.challenge.target.radius) {
+    if (distance < target.radius) {
         setTimeout(() => {
             alert("Congratulations! You completed the challenge!");
         }, 100);
     }
+}
+
+function loadChallenge(id) {
+    const challenge = CHALLENGES[id];
+    if (!challenge) {
+        console.error(`Challenge with id ${id} not found.`);
+        return;
+    }
+    state.currentChallenge = challenge;
+
+    // Update DOM elements
+    const titleEl = document.getElementById('challenge-title');
+    const instructionsEl = document.getElementById('challenge-instructions');
+    if (titleEl) titleEl.textContent = challenge.title;
+    if (instructionsEl) instructionsEl.textContent = challenge.instructions;
+
+    reset();
 }
 
 function init() {
@@ -97,7 +117,7 @@ function init() {
         return;
     }
     ctx = canvas.getContext('2d');
-    reset();
+    loadChallenge('CH001'); // Load the first challenge by default
 }
 
 function parseAndExecute(code) {
