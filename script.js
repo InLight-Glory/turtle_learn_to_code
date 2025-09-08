@@ -222,7 +222,7 @@ function main() {
 
             if (document.getElementById('challenge-selection')) {
                 initIndexPage();
-            } else if (document.getElementById('challenge-layout')) {
+            } else if (document.querySelector('.challenge-layout')) {
                 initChallengePage();
             }
         })
