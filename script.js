@@ -1,17 +1,18 @@
 console.log("Welcome to the Coding Challenge site!");
 
-// --- State Management ---
+// --- Global App State ---
+let ALL_DATA = {}; // Will be populated by fetching challenges.json
 const state = {
     turtle: { x: 0, y: 0, angle: 0, penDown: true },
     lines: [],
     currentChallenge: null
 };
-
 let ctx;
 let turtleIcon;
 
 // --- Render Engine ---
 function render() {
+    // ... (This function remains mostly the same, but uses ALL_DATA)
     if (!ctx || !turtleIcon || !state.currentChallenge) return;
     const canvas = document.getElementById('turtle-canvas');
     if (canvas) ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -76,31 +77,27 @@ function checkWinCondition() {
 
 // --- Page Initializers & UI Logic ---
 function loadChallenge(id) {
-    const challenge = CHALLENGES[id];
-    if (!challenge) {
-        console.error(`Challenge with id ${id} not found.`);
-        return;
-    }
+    const challenge = ALL_DATA.challenges[id];
+    if (!challenge) return;
     state.currentChallenge = challenge;
 
     const titleEl = document.getElementById('challenge-title');
     const instructionsEl = document.getElementById('challenge-instructions');
     if (titleEl) titleEl.textContent = challenge.title;
-    if (instructionsEl) instructionsEl.innerHTML = challenge.goal + "<br><br>" + challenge.learningObjective;
+    if (instructionsEl) instructionsEl.innerHTML = (challenge.goal || '') + "<br><br>" + (challenge.learningObjective || '');
 
     reset();
 }
 
 function populateChallengeList(grade) {
     const challengeList = document.getElementById('challenge-list');
-    if (!challengeList) return;
-    challengeList.innerHTML = ''; // Clear previous list
+    challengeList.innerHTML = '';
 
-    const sets = CURRICULUM[grade];
+    const sets = ALL_DATA.curriculum[grade];
     for (const set in sets) {
         const challengeIds = sets[set];
         challengeIds.forEach(id => {
-            const challenge = CHALLENGES[id];
+            const challenge = ALL_DATA.challenges[id];
             if (challenge) {
                 const link = document.createElement('a');
                 link.href = `challenge.html?id=${id}`;
@@ -113,12 +110,10 @@ function populateChallengeList(grade) {
 
 function initIndexPage() {
     const gradeSelection = document.getElementById('grade-selection');
-    if (!gradeSelection) return;
-
-    const gradeOrder = ['K', '1', '2']; // Explicitly define order
+    const gradeOrder = ['K', '1', '2'];
 
     gradeOrder.forEach((grade, index) => {
-        if (!CURRICULUM[grade]) return; // Skip if grade doesn't exist in data
+        if (!ALL_DATA.curriculum[grade]) return;
 
         const btn = document.createElement('button');
         btn.className = 'grade-btn';
@@ -131,7 +126,7 @@ function initIndexPage() {
         gradeSelection.appendChild(btn);
 
         if (index === 0) {
-            btn.click(); // Auto-select the first grade
+            btn.click();
         }
     });
 }
@@ -143,7 +138,7 @@ function initChallengePage() {
     ctx = canvas.getContext('2d');
 
     const urlParams = new URLSearchParams(window.location.search);
-    const challengeId = urlParams.get('id') || 'K_S1C1'; // Default to first challenge
+    const challengeId = urlParams.get('id') || 'K_S1C1';
     loadChallenge(challengeId);
 
     const runCodeBtn = document.getElementById('run-code-btn');
@@ -174,9 +169,18 @@ function parseAndExecute(code) {
 
 // --- Main Execution ---
 document.addEventListener('DOMContentLoaded', () => {
-    if (document.getElementById('challenge-selection')) {
-        initIndexPage();
-    } else if (document.getElementById('challenge-layout')) {
-        initChallengePage();
-    }
+    fetch('challenges.json')
+        .then(response => response.json())
+        .then(data => {
+            ALL_DATA = data; // Store the loaded data globally
+            if (document.getElementById('challenge-selection')) {
+                initIndexPage();
+            } else if (document.getElementById('challenge-layout')) {
+                initChallengePage();
+            }
+        })
+        .catch(error => {
+            console.error('Error loading challenge data:', error);
+            // Optionally, display an error message to the user
+        });
 });
