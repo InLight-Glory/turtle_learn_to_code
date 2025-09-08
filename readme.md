@@ -1,17 +1,30 @@
-# Coding Challenge Site
+# Coding Champions
 
 This project is a coding challenge site designed to help kids from 4 to 18 years old learn to code and become experts in problem-solving. The site will feature a series of challenges that ramp up in difficulty as the user progresses through different grade levels.
 
 ## Technology Stack
 
-This project is being built using vanilla PHP, CSS, and JavaScript.
+This project is being built using **HTML, CSS, and vanilla JavaScript**. The challenge curriculum and layouts are loaded dynamically from local **JSON** files.
 
-## Grade Levels
+## Project Roadmap
 
-The difficulty of the challenges will be tailored to different age groups:
+This roadmap outlines the current status of the project and the planned next steps.
 
-*   **K-1:** Basic movement challenges using a turtle. Kids will learn to connect simple coding blocks to make the turtle move and change colors.
-*   **Middle School:** The turtle gets special abilities like time manipulation and space warping. Challenges will involve geometry and trigonometry.
-*   **High School (Grades 11-12):** The playful elements are removed, and the focus shifts to pure coding. The challenges will be equivalent to bachelor's and master's level computer science problems, designed to impress potential employers.
+### ✅ Phase 1: Foundation & Core Gameplay (Complete)
+- **Static Site Structure:** The application is built on a simple and robust HTML, CSS, and JS foundation.
+- **Data-Driven Content:** Challenge and layout data are externalized into `challenges.json` and `layouts.json`, allowing for easy content management.
+- **Interactive Challenge UI:** The `challenge.html` page features a code editor, a visualization area, and instruction panels.
+- **Core Gameplay Loop:** The application can parse user code (`forward`, `turn`), move a turtle icon on the screen, and check for a win condition against a target.
+- **Dynamic Curriculum UI:** The landing page features a UI to select Grades and Sets, which dynamically displays the available challenges from the JSON data.
+- **Customizable Layouts:** The challenge page includes a dropdown to dynamically change the page layout using CSS Grid.
 
-The goal is to create a fun and engaging learning experience that takes kids from their first steps in coding to becoming expert problem solvers.
+### ⏳ Phase 2: Enhancing the User Experience (Next Steps)
+- **Client-Side Progress Tracking:** Use the browser's `localStorage` to save a user's progress, marking which challenges they have completed.
+- **Improved Code Editor:** Integrate a more advanced code editor library (e.g., CodeMirror, Ace) to provide syntax highlighting and a better user experience.
+- **Expanded Turtle Command Set:** Implement more advanced turtle commands (e.g., `penUp`, `penDown`, `setColor`) to support a wider variety of challenges.
+- **Full Curriculum Content:** Flesh out the `challenges.json` file with the complete set of challenges for all defined grades and sets.
+
+### 未来 Phase 3: Future Backend Integration (Future)
+- **User Accounts:** Implement user registration and login.
+- **Persistent Progress:** Save user progress to a server-side database.
+- **Server-Side Code Validation:** For more complex challenges, implement a secure, server-side validation system.
