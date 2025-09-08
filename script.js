@@ -212,7 +212,7 @@ function parseAndExecute(code) {
 }
 
 // --- Main Execution ---
-document.addEventListener('DOMContentLoaded', () => {
+function main() {
     const challengeDataPromise = fetch('challenges.json').then(res => res.json());
     const layoutDataPromise = fetch('layouts.json').then(res => res.json());
 
@@ -229,4 +229,6 @@ document.addEventListener('DOMContentLoaded', () => {
         .catch(error => {
             console.error('Error loading data:', error);
         });
-});
+}
+
+main(); // Run the application
