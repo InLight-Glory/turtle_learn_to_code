@@ -12,7 +12,6 @@ let turtleIcon;
 
 // --- Render Engine ---
 function render() {
-    // ... (This function remains mostly the same, but uses ALL_DATA)
     if (!ctx || !turtleIcon || !state.currentChallenge) return;
     const canvas = document.getElementById('turtle-canvas');
     if (canvas) ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -89,23 +88,46 @@ function loadChallenge(id) {
     reset();
 }
 
-function populateChallengeList(grade) {
+function populateChallengeList(grade, set) {
     const challengeList = document.getElementById('challenge-list');
     challengeList.innerHTML = '';
 
+    const challengeIds = ALL_DATA.curriculum[grade][set];
+    if (!challengeIds) return;
+
+    challengeIds.forEach(id => {
+        const challenge = ALL_DATA.challenges[id];
+        if (challenge) {
+            const link = document.createElement('a');
+            link.href = `challenge.html?id=${id}`;
+            link.innerHTML = `<h4>${challenge.title}</h4><p>${challenge.goal || ''}</p>`;
+            challengeList.appendChild(link);
+        }
+    });
+}
+
+function populateSetButtons(grade) {
+    const setSelection = document.getElementById('set-selection');
+    setSelection.innerHTML = '';
+    const challengeList = document.getElementById('challenge-list');
+    challengeList.innerHTML = ''; // Clear challenge list when grade changes
+
     const sets = ALL_DATA.curriculum[grade];
-    for (const set in sets) {
-        const challengeIds = sets[set];
-        challengeIds.forEach(id => {
-            const challenge = ALL_DATA.challenges[id];
-            if (challenge) {
-                const link = document.createElement('a');
-                link.href = `challenge.html?id=${id}`;
-                link.innerHTML = `<h4>${challenge.title}</h4><p>${challenge.goal || ''}</p>`;
-                challengeList.appendChild(link);
-            }
-        });
-    }
+    Object.keys(sets).forEach((set, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'grade-btn'; // Re-using grade-btn style for sets
+        btn.textContent = `Set ${set}`;
+        btn.onclick = () => {
+            document.querySelectorAll('#set-selection .grade-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            populateChallengeList(grade, set);
+        };
+        setSelection.appendChild(btn);
+
+        if (index === 0) {
+            btn.click(); // Auto-select the first set
+        }
+    });
 }
 
 function initIndexPage() {
@@ -119,14 +141,14 @@ function initIndexPage() {
         btn.className = 'grade-btn';
         btn.textContent = `Grade ${grade}`;
         btn.onclick = () => {
-            document.querySelectorAll('.grade-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('#grade-selection .grade-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            populateChallengeList(grade);
+            populateSetButtons(grade);
         };
         gradeSelection.appendChild(btn);
 
         if (index === 0) {
-            btn.click();
+            btn.click(); // Auto-select the first grade
         }
     });
 }
@@ -172,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch('challenges.json')
         .then(response => response.json())
         .then(data => {
-            ALL_DATA = data; // Store the loaded data globally
+            ALL_DATA = data;
             if (document.getElementById('challenge-selection')) {
                 initIndexPage();
             } else if (document.getElementById('challenge-layout')) {
@@ -181,6 +203,5 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => {
             console.error('Error loading challenge data:', error);
-            // Optionally, display an error message to the user
         });
 });
