@@ -20,18 +20,26 @@
     </header>
     <main>
         <div class="container">
-            <h2 id="challenge-title">Challenge Title</h2>
+            <div class="challenge-header">
+                <h2 id="challenge-title">Challenge Title</h2>
+                <div class="layout-controls">
+                    <label for="layout-select">Layout:</label>
+                    <select id="layout-select">
+                        <!-- Options will be populated by JS -->
+                    </select>
+                </div>
+            </div>
             <div class="challenge-layout">
-                <div class="challenge-instructions">
+                <div class="challenge-instructions panel">
                     <h3>Instructions</h3>
                     <p id="challenge-instructions">Challenge instructions will be loaded here.</p>
                 </div>
-                <div class="code-editor-container">
+                <div class="code-editor-container panel">
                     <h3>Your Code</h3>
                     <textarea id="code-editor" rows="10"></textarea>
                     <button class="button" id="run-code-btn">Run Code</button>
                 </div>
-                <div class="visualization-container">
+                <div class="visualization-container panel">
                     <h3>Visualization</h3>
                     <div id="canvas-wrapper">
                         <canvas id="turtle-canvas" width="400" height="400"></canvas>

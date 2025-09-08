@@ -1,0 +1,22 @@
+{
+  "default": {
+    "title": "Default View",
+    "areas": [
+      "'instructions visualization'",
+      "'editor editor'"
+    ]
+  },
+  "focus-code": {
+    "title": "Focus on Code",
+    "areas": [
+      "'editor editor'",
+      "'instructions visualization'"
+    ]
+  },
+  "side-by-side": {
+    "title": "Side-by-Side",
+    "areas": [
+      "'instructions editor visualization'"
+    ]
+  }
+}

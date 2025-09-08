@@ -118,20 +118,48 @@ body > header, body > main, body > footer {
 }
 
 /* Challenge Page Specific Styles */
-.challenge-layout {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 30px;
-    margin-top: 20px;
+.challenge-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
-.challenge-instructions,
-.code-editor-container,
-.visualization-container {
+.layout-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#layout-select {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid var(--light-gray);
+}
+
+.challenge-layout {
+    display: grid;
+    gap: 20px;
+    /* grid-template-areas will be set by JS */
+}
+
+.panel { /* Replaces individual container styles */
     background: #fff;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.challenge-instructions {
+    grid-area: instructions;
+}
+
+.code-editor-container {
+    grid-area: editor;
+}
+
+.visualization-container {
+    grid-area: visualization;
 }
 
 .challenge-layout h3 {

@@ -1,7 +1,7 @@
 console.log("Welcome to the Coding Challenge site!");
 
 // --- Global App State ---
-let ALL_DATA = {}; // Will be populated by fetching challenges.json
+let ALL_DATA = {}; // Will be populated by fetching json files
 const state = {
     turtle: { x: 0, y: 0, angle: 0, penDown: true },
     lines: [],
@@ -110,12 +110,12 @@ function populateSetButtons(grade) {
     const setSelection = document.getElementById('set-selection');
     setSelection.innerHTML = '';
     const challengeList = document.getElementById('challenge-list');
-    challengeList.innerHTML = ''; // Clear challenge list when grade changes
+    challengeList.innerHTML = '';
 
     const sets = ALL_DATA.curriculum[grade];
     Object.keys(sets).forEach((set, index) => {
         const btn = document.createElement('button');
-        btn.className = 'grade-btn'; // Re-using grade-btn style for sets
+        btn.className = 'grade-btn';
         btn.textContent = `Set ${set}`;
         btn.onclick = () => {
             document.querySelectorAll('#set-selection .grade-btn').forEach(b => b.classList.remove('active'));
@@ -123,10 +123,7 @@ function populateSetButtons(grade) {
             populateChallengeList(grade, set);
         };
         setSelection.appendChild(btn);
-
-        if (index === 0) {
-            btn.click(); // Auto-select the first set
-        }
+        if (index === 0) btn.click();
     });
 }
 
@@ -136,7 +133,6 @@ function initIndexPage() {
 
     gradeOrder.forEach((grade, index) => {
         if (!ALL_DATA.curriculum[grade]) return;
-
         const btn = document.createElement('button');
         btn.className = 'grade-btn';
         btn.textContent = `Grade ${grade}`;
@@ -146,11 +142,36 @@ function initIndexPage() {
             populateSetButtons(grade);
         };
         gradeSelection.appendChild(btn);
-
-        if (index === 0) {
-            btn.click(); // Auto-select the first grade
-        }
+        if (index === 0) btn.click();
     });
+}
+
+function initLayoutSwitcher() {
+    const layoutSelect = document.getElementById('layout-select');
+    const challengeLayout = document.querySelector('.challenge-layout');
+    if (!layoutSelect || !challengeLayout) return;
+
+    for (const key in ALL_DATA.layouts) {
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = ALL_DATA.layouts[key].title;
+        layoutSelect.appendChild(option);
+    }
+
+    layoutSelect.onchange = (e) => {
+        const selectedLayoutKey = e.target.value;
+        const layout = ALL_DATA.layouts[selectedLayoutKey];
+        if (layout) {
+            challengeLayout.style.gridTemplateAreas = layout.areas.join(' ');
+        }
+    };
+
+    // Set default layout
+    if (ALL_DATA.layouts.default) {
+        const defaultOption = layoutSelect.querySelector('option[value="default"]');
+        if (defaultOption) defaultOption.selected = true;
+        challengeLayout.style.gridTemplateAreas = ALL_DATA.layouts.default.areas.join(' ');
+    }
 }
 
 function initChallengePage() {
@@ -162,6 +183,7 @@ function initChallengePage() {
     const urlParams = new URLSearchParams(window.location.search);
     const challengeId = urlParams.get('id') || 'K_S1C1';
     loadChallenge(challengeId);
+    initLayoutSwitcher();
 
     const runCodeBtn = document.getElementById('run-code-btn');
     if (runCodeBtn) {
@@ -191,10 +213,13 @@ function parseAndExecute(code) {
 
 // --- Main Execution ---
 document.addEventListener('DOMContentLoaded', () => {
-    fetch('challenges.json')
-        .then(response => response.json())
-        .then(data => {
-            ALL_DATA = data;
+    const challengeDataPromise = fetch('challenges.json').then(res => res.json());
+    const layoutDataPromise = fetch('layouts.json').then(res => res.json());
+
+    Promise.all([challengeDataPromise, layoutDataPromise])
+        .then(([challengeData, layoutData]) => {
+            ALL_DATA = { ...challengeData, layouts: layoutData };
+
             if (document.getElementById('challenge-selection')) {
                 initIndexPage();
             } else if (document.getElementById('challenge-layout')) {
@@ -202,6 +227,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         })
         .catch(error => {
-            console.error('Error loading challenge data:', error);
+            console.error('Error loading data:', error);
         });
 });
