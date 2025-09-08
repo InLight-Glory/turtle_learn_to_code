@@ -1,0 +1,70 @@
+{
+  "challenges": {
+    "K_S1C1": {
+      "title": "First Steps",
+      "goal": "Move the turtle forward to the target.",
+      "learningObjective": "Learn the 'forward(n)' command and understand that computers follow instructions in sequence.",
+      "startPosition": { "x": 50, "y": 200, "angle": 0 },
+      "target": { "x": 350, "y": 200, "radius": 15 }
+    },
+    "K_S1C2": {
+      "title": "A Simple Turn",
+      "goal": "Turn the turtle to face the target, then move forward.",
+      "learningObjective": "Learn the 'turn(d)' command for changing direction.",
+      "startPosition": { "x": 200, "y": 350, "angle": -90 },
+      "target": { "x": 200, "y": 50, "radius": 15 }
+    },
+    "K_S1C3": { "title": "Box Step 1: Forward and Turn" },
+    "K_S1C4": { "title": "Box Step 2: Two Sides" },
+    "K_S1C5": { "title": "Box Step 3: Three Sides" },
+    "K_S1C6": { "title": "Complete the Square" },
+    "K_S1C7": { "title": "Staircase" },
+    "G1_S1C1": {
+      "title": "Pen Colors",
+      "goal": "Draw a red line, then a blue line.",
+      "learningObjective": "Learn the 'penColor(c)' command to change the turtle's trail color.",
+      "startPosition": { "x": 50, "y": 200, "angle": 0 },
+      "target": { "x": 350, "y": 200, "radius": 15 }
+    },
+    "G1_S1C2": {
+      "title": "Lift the Pen",
+      "goal": "Move to a new spot without drawing a line.",
+      "learningObjective": "Learn 'penUp()' and 'penDown()' to control when the turtle draws.",
+      "startPosition": { "x": 50, "y": 100, "angle": 0 },
+      "target": { "x": 350, "y": 300, "radius": 15 }
+    },
+    "G1_S1C3": { "title": "Dashed Line" },
+    "G1_S1C4": { "title": "Introduction to Loops" },
+    "G1_S1C5": { "title": "Draw a Square with a Loop" },
+    "G1_S1C6": { "title": "Looping Colors" },
+    "G1_S1C7": { "title": "Nested Loops" },
+    "G2_S1C1": {
+      "title": "My First Function",
+      "goal": "Define a sequence of commands to draw a shape, then call it.",
+      "learningObjective": "Understand the concept of abstraction by defining and calling a simple function.",
+      "startPosition": { "x": 100, "y": 200, "angle": 0 },
+      "target": { "x": 300, "y": 200, "radius": 15 }
+    },
+    "G2_S1C2": {
+      "title": "Function with Parameters",
+      "goal": "Create a function that takes a 'size' parameter to draw shapes of different sizes.",
+      "learningObjective": "Learn how to make functions more flexible with parameters.",
+      "startPosition": { "x": 100, "y": 200, "angle": 0 },
+      "target": { "x": 300, "y": 200, "radius": 15 }
+    }
+  },
+  "curriculum": {
+    "K": {
+      "1": ["K_S1C1", "K_S1C2", "K_S1C3", "K_S1C4", "K_S1C5", "K_S1C6", "K_S1C7"],
+      "2": [], "3": [], "4": [], "5": []
+    },
+    "1": {
+      "1": ["G1_S1C1", "G1_S1C2", "G1_S1C3", "G1_S1C4", "G1_S1C5", "G1_S1C6", "G1_S1C7"],
+      "2": [], "3": [], "4": [], "5": []
+    },
+    "2": {
+      "1": ["G2_S1C1", "G2_S1C2"],
+      "2": [], "3": [], "4": [], "5": []
+    }
+  }
+}

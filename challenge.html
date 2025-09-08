@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coding Challenge - Level 1</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Coding Champions</h1>
+            <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="challenge.html">Challenges</a></li>
+            </ul>
+            </nav>
+        </div>
+    </header>
+    <main>
+        <div class="container">
+            <div class="challenge-header">
+                <h2 id="challenge-title">Challenge Title</h2>
+                <div class="layout-controls">
+                    <label for="layout-select">Layout:</label>
+                    <select id="layout-select">
+                        <!-- Options will be populated by JS -->
+                    </select>
+                </div>
+            </div>
+            <div class="challenge-layout">
+                <div class="challenge-instructions panel">
+                    <h3>Instructions</h3>
+                    <p id="challenge-instructions">Challenge instructions will be loaded here.</p>
+                </div>
+                <div class="code-editor-container panel">
+                    <h3>Your Code</h3>
+                    <textarea id="code-editor" rows="10"></textarea>
+                    <button class="button" id="run-code-btn">Run Code</button>
+                </div>
+                <div class="visualization-container panel">
+                    <h3>Visualization</h3>
+                    <div id="canvas-wrapper">
+                        <canvas id="turtle-canvas" width="400" height="400"></canvas>
+                        <div id="turtle-icon">🐢</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Coding Champions</p>
+        </div>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
