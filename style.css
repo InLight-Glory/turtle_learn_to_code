@@ -1,0 +1,249 @@
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #f1c40f;
+    --background-color: #f8f9fa;
+    --text-color: #333;
+    --light-gray: #ecf0f1;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+header {
+    background: #fff;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--light-gray);
+    text-align: center;
+}
+
+header h1 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+main {
+    padding: 40px 0;
+}
+
+section {
+    background: #fff;
+    margin-bottom: 20px;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+section h2 {
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+#features ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+#features li {
+    margin-bottom: 10px;
+    padding-left: 20px;
+    position: relative;
+}
+
+#features li:before {
+    content: '✔';
+    color: var(--primary-color);
+    position: absolute;
+    left: 0;
+}
+
+#cta {
+    text-align: center;
+}
+
+.button {
+    display: inline-block;
+    background-color: var(--primary-color);
+    color: #fff;
+    padding: 15px 30px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #2980b9;
+}
+
+footer {
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 40px;
+    border-top: 1px solid var(--light-gray);
+    color: #777;
+}
+
+/* Add a container class to index.php for these styles to apply */
+body > header, body > main, body > footer {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+@media (min-width: 768px) {
+    body > header, body > main, body > footer {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    main {
+        width: 80%;
+        margin: 0 auto;
+    }
+}
+
+/* Challenge Page Specific Styles */
+.challenge-layout {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.challenge-instructions,
+.code-editor-container,
+.visualization-container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.challenge-layout h3 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+#code-editor {
+    width: 100%;
+    border: 1px solid var(--light-gray);
+    border-radius: 5px;
+    padding: 10px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1em;
+    margin-bottom: 15px;
+}
+
+#run-code-btn {
+    width: 100%;
+}
+
+#turtle-canvas {
+    border: 1px solid var(--light-gray);
+    border-radius: 5px;
+    width: 100%;
+    height: auto;
+}
+
+/* Navigation Styles */
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 10px;
+}
+
+nav ul li {
+    display: inline-block;
+    margin: 0 15px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: var(--primary-color);
+    font-weight: bold;
+    font-size: 1.1em;
+    transition: color 0.3s ease;
+}
+
+nav ul li a:hover {
+    color: #2980b9;
+}
+
+/* DOM Turtle Styles */
+#canvas-wrapper {
+    position: relative;
+}
+
+#turtle-icon {
+    position: absolute;
+    font-size: 24px;
+    /* Center the icon on its coordinates */
+    transform: translate(-50%, -50%);
+    transition: top 0.1s linear, left 0.1s linear, transform 0.1s linear;
+}
+
+/* Challenge Selection UI Styles */
+#grade-selection {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.grade-btn {
+    background-color: var(--light-gray);
+    border: 1px solid #ccc;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+.grade-btn.active, .grade-btn:hover {
+    background-color: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+}
+
+#challenge-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+#challenge-list a {
+    display: block;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    text-decoration: none;
+    color: var(--text-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#challenge-list a:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+#challenge-list h4 {
+    color: var(--primary-color);
+    margin-bottom: 5px;
+}
