@@ -212,7 +212,7 @@ function parseAndExecute(code) {
 }
 
 // --- Main Execution ---
-document.addEventListener('DOMContentLoaded', () => {
+function main() {
     const challengeDataPromise = fetch('challenges.json').then(res => res.json());
     const layoutDataPromise = fetch('layouts.json').then(res => res.json());
 
@@ -222,11 +222,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (document.getElementById('challenge-selection')) {
                 initIndexPage();
-            } else if (document.getElementById('challenge-layout')) {
+            } else if (document.querySelector('.challenge-layout')) {
                 initChallengePage();
             }
         })
         .catch(error => {
             console.error('Error loading data:', error);
         });
-});
+}
+
+main(); // Run the application
