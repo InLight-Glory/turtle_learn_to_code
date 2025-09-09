@@ -34,8 +34,13 @@ function render() {
         ctx.stroke();
     });
 
-    turtleIcon.style.left = `${state.turtle.x}px`;
-    turtleIcon.style.top = `${state.turtle.y}px`;
+    // Clamp turtle position to stay within canvas bounds
+    const canvasWidth = canvas ? canvas.width : 400;
+    const canvasHeight = canvas ? canvas.height : 400;
+    let clampedX = Math.max(0, Math.min(state.turtle.x, canvasWidth));
+    let clampedY = Math.max(0, Math.min(state.turtle.y, canvasHeight));
+    turtleIcon.style.left = `${clampedX}px`;
+    turtleIcon.style.top = `${clampedY}px`;
     turtleIcon.style.transform = `translate(-50%, -50%) rotate(${state.turtle.angle + 90}deg)`;
 }
 
