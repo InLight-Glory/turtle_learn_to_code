@@ -5,7 +5,8 @@ let ALL_DATA = {}; // Will be populated by fetching json files
 const state = {
     turtle: { x: 0, y: 0, angle: 0, penDown: true },
     lines: [],
-    currentChallenge: null
+    currentChallenge: null,
+    progress: { completedChallenges: [] }
 };
 let ctx;
 let turtleIcon;
@@ -34,13 +35,8 @@ function render() {
         ctx.stroke();
     });
 
-    // Clamp turtle position to stay within canvas bounds
-    const canvasWidth = canvas ? canvas.width : 400;
-    const canvasHeight = canvas ? canvas.height : 400;
-    let clampedX = Math.max(0, Math.min(state.turtle.x, canvasWidth));
-    let clampedY = Math.max(0, Math.min(state.turtle.y, canvasHeight));
-    turtleIcon.style.left = `${clampedX}px`;
-    turtleIcon.style.top = `${clampedY}px`;
+    turtleIcon.style.left = `${state.turtle.x}px`;
+    turtleIcon.style.top = `${state.turtle.y}px`;
     turtleIcon.style.transform = `translate(-50%, -50%) rotate(${state.turtle.angle + 90}deg)`;
 }
 
@@ -70,11 +66,26 @@ function turn(degrees) {
     state.turtle.angle += degrees;
 }
 
+// --- Progress Management ---
+function getProgress() {
+    const progress = localStorage.getItem('codingChampionsProgress');
+    return progress ? JSON.parse(progress) : { completedChallenges: [] };
+}
+
+function saveProgress(progress) {
+    localStorage.setItem('codingChampionsProgress', JSON.stringify(progress));
+}
+
 function checkWinCondition() {
     if (!state.currentChallenge || !state.currentChallenge.target) return;
     const target = state.currentChallenge.target;
     const distance = Math.sqrt(Math.pow(state.turtle.x - target.x, 2) + Math.pow(state.turtle.y - target.y, 2));
     if (distance < target.radius) {
+        const progress = getProgress();
+        if (!progress.completedChallenges.includes(state.currentChallenge.id)) {
+            progress.completedChallenges.push(state.currentChallenge.id);
+            saveProgress(progress);
+        }
         setTimeout(() => alert("Congratulations! You completed the challenge!"), 100);
     }
 }
@@ -83,7 +94,7 @@ function checkWinCondition() {
 function loadChallenge(id) {
     const challenge = ALL_DATA.challenges[id];
     if (!challenge) return;
-    state.currentChallenge = challenge;
+    state.currentChallenge = { ...challenge, id: id };
 
     const titleEl = document.getElementById('challenge-title');
     const instructionsEl = document.getElementById('challenge-instructions');
@@ -105,7 +116,13 @@ function populateChallengeList(grade, set) {
         if (challenge) {
             const link = document.createElement('a');
             link.href = `challenge.html?id=${id}`;
-            link.innerHTML = `<h4>${challenge.title}</h4><p>${challenge.goal || ''}</p>`;
+
+                const isCompleted = state.progress.completedChallenges.includes(id);
+                if (isCompleted) {
+                    link.classList.add('completed');
+                }
+
+                link.innerHTML = `<h4>${challenge.title} ${isCompleted ? '✅' : ''}</h4><p>${challenge.goal || ''}</p>`;
             challengeList.appendChild(link);
         }
     });
@@ -133,6 +150,7 @@ function populateSetButtons(grade) {
 }
 
 function initIndexPage() {
+    state.progress = getProgress(); // Load progress on page init
     const gradeSelection = document.getElementById('grade-selection');
     const gradeOrder = ['K', '1', '2'];
 
@@ -227,7 +245,7 @@ function main() {
 
             if (document.getElementById('challenge-selection')) {
                 initIndexPage();
-            } else if (document.querySelector('.challenge-layout')) {
+            } else if (document.getElementById('challenge-layout')) {
                 initChallengePage();
             }
         })

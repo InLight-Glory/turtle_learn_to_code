@@ -148,6 +148,8 @@ body > header, body > main, body > footer {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    min-height: 250px; /* Prevent layout overlap on wrap */
+    position: relative; /* Establish stacking context for z-index */
 }
 
 .challenge-instructions {
@@ -156,10 +158,12 @@ body > header, body > main, body > footer {
 
 .code-editor-container {
     grid-area: editor;
+    z-index: 10; /* Ensure editor and button are on top */
 }
 
 .visualization-container {
     grid-area: visualization;
+    z-index: 5; /* Sit below the editor panel */
 }
 
 .challenge-layout h3 {
@@ -283,4 +287,9 @@ nav ul li a:hover {
 #challenge-list h4 {
     color: var(--primary-color);
     margin-bottom: 5px;
+}
+
+#challenge-list a.completed {
+    background-color: #e8f5e9; /* A light green */
+    border-left: 5px solid #4caf50; /* A darker green */
 }
