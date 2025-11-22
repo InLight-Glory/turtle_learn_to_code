@@ -183,6 +183,7 @@ footer {
 
 .code-editor-container {
     grid-area: editor;
+    z-index: 10; /* Ensure editor and button are on top */
 }
 
 .visualization-container {

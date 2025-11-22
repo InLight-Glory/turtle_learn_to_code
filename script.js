@@ -5,7 +5,8 @@ const ALL_DATA = window.ALL_DATA; // Loaded from data.js
 const state = {
     turtle: { x: 0, y: 0, angle: 0, penDown: true, color: 'black' },
     lines: [],
-    currentChallenge: null
+    currentChallenge: null,
+    progress: { completedChallenges: [] }
 };
 let ctx;
 let turtleIcon;
@@ -81,6 +82,16 @@ function turn(degrees) {
     state.turtle.angle += degrees;
 }
 
+// --- Progress Management ---
+function getProgress() {
+    const progress = localStorage.getItem('codingChampionsProgress');
+    return progress ? JSON.parse(progress) : { completedChallenges: [] };
+}
+
+function saveProgress(progress) {
+    localStorage.setItem('codingChampionsProgress', JSON.stringify(progress));
+}
+
 function checkWinCondition() {
     if (!state.currentChallenge || !state.currentChallenge.target) return;
     const target = state.currentChallenge.target;
@@ -153,6 +164,7 @@ function populateSetButtons(grade) {
 }
 
 function initIndexPage() {
+    state.progress = getProgress(); // Load progress on page init
     const gradeSelection = document.getElementById('grade-selection');
     const gradeOrder = Object.keys(ALL_DATA.curriculum).sort((a, b) => {
         if (a === 'K') return -1;
