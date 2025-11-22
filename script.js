@@ -75,6 +75,12 @@ function checkWinCondition() {
     const target = state.currentChallenge.target;
     const distance = Math.sqrt(Math.pow(state.turtle.x - target.x, 2) + Math.pow(state.turtle.y - target.y, 2));
     if (distance < target.radius) {
+        const id = state.currentChallenge.id;
+        let completed = JSON.parse(localStorage.getItem('completedChallenges') || '[]');
+        if (!completed.includes(id)) {
+            completed.push(id);
+            localStorage.setItem('completedChallenges', JSON.stringify(completed));
+        }
         setTimeout(() => alert("Congratulations! You completed the challenge!"), 100);
     }
 }
@@ -83,7 +89,7 @@ function checkWinCondition() {
 function loadChallenge(id) {
     const challenge = ALL_DATA.challenges[id];
     if (!challenge) return;
-    state.currentChallenge = challenge;
+    state.currentChallenge = { ...challenge, id: id };
 
     const titleEl = document.getElementById('challenge-title');
     const instructionsEl = document.getElementById('challenge-instructions');
@@ -100,12 +106,17 @@ function populateChallengeList(grade, set) {
     const challengeIds = ALL_DATA.curriculum[grade][set];
     if (!challengeIds) return;
 
+    const completed = JSON.parse(localStorage.getItem('completedChallenges') || '[]');
+
     challengeIds.forEach(id => {
         const challenge = ALL_DATA.challenges[id];
         if (challenge) {
             const link = document.createElement('a');
             link.href = `challenge.html?id=${id}`;
             link.innerHTML = `<h4>${challenge.title}</h4><p>${challenge.goal || ''}</p>`;
+            if (completed.includes(id)) {
+                link.classList.add('completed-challenge');
+            }
             challengeList.appendChild(link);
         }
     });
