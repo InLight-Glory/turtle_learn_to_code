@@ -2,113 +2,113 @@
   "challenges": {
     "K_S1C1": {
       "title": "First Steps",
-      "goal": "Move the turtle forward to the target.",
-      "learningObjective": "Learn the 'forward(n)' command and understand that computers follow instructions in sequence.",
+      "goal": "Type 'forward(150)' to move the turtle to the yellow circle.",
+      "learningObjective": "Tell the computer to move the turtle.",
       "startPosition": { "x": 50, "y": 200, "angle": 0 },
       "target": { "x": 350, "y": 200, "radius": 15 }
     },
     "K_S1C2": {
       "title": "A Simple Turn",
-      "goal": "Turn the turtle to face the target, then move forward.",
-      "learningObjective": "Learn the 'turn(d)' command for changing direction.",
+      "goal": "Type 'turn(90)' to face up. Then type 'forward(150)'.",
+      "learningObjective": "Learn to turn the turtle.",
       "startPosition": { "x": 200, "y": 350, "angle": -90 },
       "target": { "x": 200, "y": 50, "radius": 15 }
     },
     "K_S1C3": {
-      "title": "Box Step 1: Forward and Turn",
-      "goal": "Move forward 100, then turn right (90 degrees).",
-      "learningObjective": "Combine move and turn commands.",
+      "title": "Corner Turn",
+      "goal": "Move 'forward(100)', then 'turn(90)'.",
+      "learningObjective": "Move and turn in one go.",
       "startPosition": { "x": 100, "y": 100, "angle": 0 },
       "target": { "x": 200, "y": 200, "radius": 15 }
     },
     "K_S1C4": {
-      "title": "Box Step 2: Two Sides",
-      "goal": "Draw two sides of a square (Forward 100, Turn 90, Forward 100).",
-      "learningObjective": "Understand sequencing multiple commands.",
+      "title": "Two Sides",
+      "goal": "Draw two lines. Forward 100, Turn 90, Forward 100.",
+      "learningObjective": "Follow a path with two steps.",
       "startPosition": { "x": 100, "y": 100, "angle": 0 },
       "target": { "x": 200, "y": 200, "radius": 15 }
     },
     "K_S1C5": {
-      "title": "Box Step 3: Three Sides",
-      "goal": "Draw three sides of a square (F 100, T 90, F 100, T 90, F 100).",
-      "learningObjective": "Reinforce sequencing and turning.",
+      "title": "Three Sides",
+      "goal": "Almost a square! Forward, Turn, Forward, Turn, Forward.",
+      "learningObjective": "Follow a longer path.",
       "startPosition": { "x": 100, "y": 100, "angle": 0 },
       "target": { "x": 100, "y": 200, "radius": 15 }
     },
     "K_S1C6": {
-      "title": "Complete the Square",
-      "goal": "Draw a full square (side length 100) to return to the start.",
-      "learningObjective": "Complete a closed shape using a sequence of repeated commands.",
+      "title": "Make a Square",
+      "goal": "Draw all 4 sides of a square. Each side is 100 long.",
+      "learningObjective": "Draw a complete shape.",
       "startPosition": { "x": 100, "y": 100, "angle": 0 },
       "target": { "x": 100, "y": 100, "radius": 15 }
     },
     "K_S1C7": {
-      "title": "Staircase",
-      "goal": "Move in a staircase pattern to reach the top right.",
-      "learningObjective": "Practice alternating turns and moves.",
+      "title": "Staircase Steps",
+      "goal": "Climb the stairs! Forward, Turn Left, Forward, Turn Right...",
+      "learningObjective": "Practice left and right turns.",
       "startPosition": { "x": 50, "y": 350, "angle": 0 },
       "target": { "x": 200, "y": 200, "radius": 25 }
     },
     "G1_S1C1": {
-      "title": "Pen Colors",
-      "goal": "Draw a red line, then a blue line.",
-      "learningObjective": "Learn the 'penColor(c)' command to change the turtle's trail color.",
+      "title": "Red and Blue",
+      "goal": "Use 'penColor(\"red\")', draw a line. Then 'penColor(\"blue\")', draw another.",
+      "learningObjective": "Change the pen color.",
       "startPosition": { "x": 50, "y": 200, "angle": 0 },
       "target": { "x": 350, "y": 200, "radius": 15 }
     },
     "G1_S1C2": {
-      "title": "Lift the Pen",
-      "goal": "Move to a new spot without drawing a line.",
-      "learningObjective": "Learn 'penUp()' and 'penDown()' to control when the turtle draws.",
+      "title": "Jump Over",
+      "goal": "Draw a line, 'penUp()', move, 'penDown()', draw again.",
+      "learningObjective": "Lift the pen to jump gaps.",
       "startPosition": { "x": 50, "y": 100, "angle": 0 },
       "target": { "x": 350, "y": 300, "radius": 15 }
     },
     "G1_S1C3": {
       "title": "Dashed Line",
-      "goal": "Draw a dashed line (draw, lift, move, lower, draw).",
-      "learningObjective": "Combine pen controls with movement.",
+      "goal": "Draw a line with gaps. Draw, Jump, Draw, Jump.",
+      "learningObjective": "Combine moving and pen controls.",
       "startPosition": { "x": 50, "y": 200, "angle": 0 },
       "target": { "x": 350, "y": 200, "radius": 15 }
     },
     "G1_S1C4": {
-      "title": "Introduction to Loops",
-      "goal": "Use 'repeat 4 {<br>&nbsp;&nbsp;forward(50)<br>}' to draw a line 4 times (for now, just draw a long line).",
-      "learningObjective": "Learn the 'repeat N { ... }' command to repeat actions.",
+      "title": "Intro to Loops",
+      "goal": "Draw a long line by repeating 'forward(50)' 4 times. <br>Use: <br>repeat 4 {<br>&nbsp;&nbsp;forward(50)<br>}",
+      "learningObjective": "Use a loop to repeat commands.",
       "startPosition": { "x": 50, "y": 200, "angle": 0 },
       "target": { "x": 250, "y": 200, "radius": 15 }
     },
     "G1_S1C5": {
-      "title": "Draw a Square with a Loop",
-      "goal": "Use 'repeat 4 {<br>&nbsp;&nbsp;forward(100)<br>&nbsp;&nbsp;turn(90)<br>}' to draw a square.",
-      "learningObjective": "Use a loop to draw a regular shape efficiently.",
+      "title": "Square Loop",
+      "goal": "Draw a square using a loop. <br>Use: <br>repeat 4 {<br>&nbsp;&nbsp;forward(100)<br>&nbsp;&nbsp;turn(90)<br>}",
+      "learningObjective": "Draw a shape efficiently with a loop.",
       "startPosition": { "x": 150, "y": 250, "angle": 0 },
       "target": { "x": 150, "y": 250, "radius": 15 }
     },
     "G1_S1C6": {
-      "title": "Looping Colors",
-      "goal": "Use a loop to draw 4 lines of different colors (change color inside the loop).",
-      "learningObjective": "Experiment with changing state inside a loop.",
+      "title": "Colorful Line",
+      "goal": "Use a loop to draw a line, changing color each time.",
+      "learningObjective": "Change colors inside a loop.",
       "startPosition": { "x": 50, "y": 200, "angle": 0 },
       "target": { "x": 350, "y": 200, "radius": 15 }
     },
     "G1_S1C7": {
-      "title": "Nested Loops",
-      "goal": "Try using a loop inside another loop! (e.g. repeat 4 { repeat 3 { ... } }).",
-      "learningObjective": "Advanced concepts: Nested loops.",
+      "title": "Double Loop",
+      "goal": "Put a loop inside a loop! Try drawing 4 small squares.",
+      "learningObjective": "Advanced: Nested Loops.",
       "startPosition": { "x": 200, "y": 200, "angle": 0 },
       "target": { "x": 200, "y": 200, "radius": 15 }
     },
     "G2_S1C1": {
       "title": "My First Function",
-      "goal": "Define a sequence of commands to draw a shape, then call it.",
-      "learningObjective": "Understand the concept of abstraction by defining and calling a simple function.",
+      "goal": "Note: Functions not yet implemented. <br>Goal: Define a 'box' command.",
+      "learningObjective": "Coming Soon: Functions.",
       "startPosition": { "x": 100, "y": 200, "angle": 0 },
       "target": { "x": 300, "y": 200, "radius": 15 }
     },
     "G2_S1C2": {
-      "title": "Function with Parameters",
-      "goal": "Create a function that takes a 'size' parameter to draw shapes of different sizes.",
-      "learningObjective": "Learn how to make functions more flexible with parameters.",
+      "title": "Smart Functions",
+      "goal": "Note: Functions not yet implemented.",
+      "learningObjective": "Coming Soon: Parameters.",
       "startPosition": { "x": 100, "y": 200, "angle": 0 },
       "target": { "x": 300, "y": 200, "radius": 15 }
     }
