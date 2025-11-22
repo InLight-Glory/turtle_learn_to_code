@@ -14,11 +14,41 @@
       "startPosition": { "x": 200, "y": 350, "angle": -90 },
       "target": { "x": 200, "y": 50, "radius": 15 }
     },
-    "K_S1C3": { "title": "Box Step 1: Forward and Turn" },
-    "K_S1C4": { "title": "Box Step 2: Two Sides" },
-    "K_S1C5": { "title": "Box Step 3: Three Sides" },
-    "K_S1C6": { "title": "Complete the Square" },
-    "K_S1C7": { "title": "Staircase" },
+    "K_S1C3": {
+      "title": "Box Step 1: Forward and Turn",
+      "goal": "Move forward 100, then turn right (90 degrees).",
+      "learningObjective": "Combine move and turn commands.",
+      "startPosition": { "x": 100, "y": 100, "angle": 0 },
+      "target": { "x": 200, "y": 200, "radius": 15 }
+    },
+    "K_S1C4": {
+      "title": "Box Step 2: Two Sides",
+      "goal": "Draw two sides of a square (Forward 100, Turn 90, Forward 100).",
+      "learningObjective": "Understand sequencing multiple commands.",
+      "startPosition": { "x": 100, "y": 100, "angle": 0 },
+      "target": { "x": 200, "y": 200, "radius": 15 }
+    },
+    "K_S1C5": {
+      "title": "Box Step 3: Three Sides",
+      "goal": "Draw three sides of a square (F 100, T 90, F 100, T 90, F 100).",
+      "learningObjective": "Reinforce sequencing and turning.",
+      "startPosition": { "x": 100, "y": 100, "angle": 0 },
+      "target": { "x": 100, "y": 200, "radius": 15 }
+    },
+    "K_S1C6": {
+      "title": "Complete the Square",
+      "goal": "Draw a full square (side length 100) to return to the start.",
+      "learningObjective": "Complete a closed shape using a sequence of repeated commands.",
+      "startPosition": { "x": 100, "y": 100, "angle": 0 },
+      "target": { "x": 100, "y": 100, "radius": 15 }
+    },
+    "K_S1C7": {
+      "title": "Staircase",
+      "goal": "Move in a staircase pattern to reach the top right.",
+      "learningObjective": "Practice alternating turns and moves.",
+      "startPosition": { "x": 50, "y": 350, "angle": 0 },
+      "target": { "x": 200, "y": 200, "radius": 25 }
+    },
     "G1_S1C1": {
       "title": "Pen Colors",
       "goal": "Draw a red line, then a blue line.",
@@ -33,11 +63,41 @@
       "startPosition": { "x": 50, "y": 100, "angle": 0 },
       "target": { "x": 350, "y": 300, "radius": 15 }
     },
-    "G1_S1C3": { "title": "Dashed Line" },
-    "G1_S1C4": { "title": "Introduction to Loops" },
-    "G1_S1C5": { "title": "Draw a Square with a Loop" },
-    "G1_S1C6": { "title": "Looping Colors" },
-    "G1_S1C7": { "title": "Nested Loops" },
+    "G1_S1C3": {
+      "title": "Dashed Line",
+      "goal": "Draw a dashed line (draw, lift, move, lower, draw).",
+      "learningObjective": "Combine pen controls with movement.",
+      "startPosition": { "x": 50, "y": 200, "angle": 0 },
+      "target": { "x": 350, "y": 200, "radius": 15 }
+    },
+    "G1_S1C4": {
+      "title": "Introduction to Loops",
+      "goal": "Note: Loops are not yet implemented in the interpreter. Just draw a long line.",
+      "learningObjective": "Placeholder for loop introduction.",
+      "startPosition": { "x": 50, "y": 200, "angle": 0 },
+      "target": { "x": 350, "y": 200, "radius": 15 }
+    },
+    "G1_S1C5": {
+      "title": "Draw a Square with a Loop",
+      "goal": "Note: Loops are not yet implemented. Draw a square manually.",
+      "learningObjective": "Placeholder for loop square.",
+      "startPosition": { "x": 150, "y": 250, "angle": 0 },
+      "target": { "x": 150, "y": 250, "radius": 15 }
+    },
+    "G1_S1C6": {
+      "title": "Looping Colors",
+      "goal": "Draw a multicolor line.",
+      "learningObjective": "Experiment with changing colors frequently.",
+      "startPosition": { "x": 50, "y": 200, "angle": 0 },
+      "target": { "x": 350, "y": 200, "radius": 15 }
+    },
+    "G1_S1C7": {
+      "title": "Nested Loops",
+      "goal": "Complex pattern placeholder.",
+      "learningObjective": "Advanced concepts placeholder.",
+      "startPosition": { "x": 200, "y": 200, "angle": 0 },
+      "target": { "x": 200, "y": 200, "radius": 15 }
+    },
     "G2_S1C1": {
       "title": "My First Function",
       "goal": "Define a sequence of commands to draw a shape, then call it.",

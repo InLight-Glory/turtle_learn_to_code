@@ -235,7 +235,7 @@ function parseAndExecute(code) {
     lines.forEach(line => {
         const match = line.trim().match(commandRegex);
         if (match) {
-            const command = match[1]; // Keep case for command name check, or lower it
+            const command = match[1].toLowerCase();
             const args = match[2].trim();
 
             // Remove quotes if present for string args
@@ -243,9 +243,9 @@ function parseAndExecute(code) {
 
             if (command === 'forward') forward(parseInt(cleanArgs, 10));
             else if (command === 'turn') turn(parseInt(cleanArgs, 10));
-            else if (command === 'penUp') penUp();
-            else if (command === 'penDown') penDown();
-            else if (command === 'penColor') penColor(cleanArgs);
+            else if (command === 'penup') penUp();
+            else if (command === 'pendown') penDown();
+            else if (command === 'pencolor') penColor(cleanArgs);
         }
     });
     render();
