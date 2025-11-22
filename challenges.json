@@ -99,18 +99,67 @@
       "target": { "x": 200, "y": 200, "radius": 15 }
     },
     "G2_S1C1": {
-      "title": "My First Function",
-      "goal": "Note: Functions not yet implemented. <br>Goal: Define a 'box' command.",
-      "learningObjective": "Coming Soon: Functions.",
-      "startPosition": { "x": 100, "y": 200, "angle": 0 },
-      "target": { "x": 300, "y": 200, "radius": 15 }
+      "title": "Function for a Square",
+      "goal": "Define and use a function to draw a square.",
+      "learningObjective": "Learn to create functions to reuse code.",
+      "startPosition": { "x": 150, "y": 250, "angle": 0 },
+      "target": { "x": 150, "y": 250, "radius": 15 }
     },
     "G2_S1C2": {
-      "title": "Smart Functions",
-      "goal": "Note: Functions not yet implemented.",
-      "learningObjective": "Coming Soon: Parameters.",
-      "startPosition": { "x": 100, "y": 200, "angle": 0 },
-      "target": { "x": 300, "y": 200, "radius": 15 }
+      "title": "Function with a Size Parameter",
+      "goal": "Create a function that can draw squares of any size.",
+      "learningObjective": "Learn to use parameters to make functions more powerful.",
+      "startPosition": { "x": 100, "y": 300, "angle": 0 },
+      "target": { "x": 300, "y": 100, "radius": 15 }
+    },
+    "G2_S1C3": {
+      "title": "Function to Draw a House",
+      "goal": "Combine a square and a triangle function to draw a house.",
+      "learningObjective": "Learn to compose functions to create more complex drawings.",
+      "startPosition": { "x": 150, "y": 300, "angle": 0 },
+      "target": { "x": 150, "y": 300, "radius": 15 }
+    },
+    "G3_S1C1": {
+      "title": "Variable for Length",
+      "goal": "Use a variable to control the length of a line.",
+      "learningObjective": "Learn to declare and use variables to store values.",
+      "startPosition": { "x": 50, "y": 200, "angle": 0 },
+      "target": { "x": 350, "y": 200, "radius": 15 }
+    },
+    "G3_S1C2": {
+      "title": "Growing Spiral",
+      "goal": "Use a variable that changes in a loop to draw a spiral.",
+      "learningObjective": "Learn how to modify variables within a loop.",
+      "startPosition": { "x": 200, "y": 200, "angle": 0 },
+      "target": { "x": 200, "y": 200, "radius": 50 }
+    },
+    "G3_S1C3": {
+      "title": "Math with Variables",
+      "goal": "Draw a half-square using a variable and division.",
+      "learningObjective": "Learn to perform simple arithmetic operations on variables.",
+      "startPosition": { "x": 100, "y": 300, "angle": 0 },
+      "target": { "x": 150, "y": 250, "radius": 15 }
+    },
+    "G4_S1C1": {
+      "title": "Conditional Color",
+      "goal": "Draw a line that changes color halfway.",
+      "learningObjective": "Learn to use 'if' statements to control program flow.",
+      "startPosition": { "x": 50, "y": 200, "angle": 0 },
+      "target": { "x": 350, "y": 200, "radius": 15 }
+    },
+    "G4_S1C2": {
+      "title": "Wall Bounce",
+      "goal": "Make the turtle turn around when it hits a 'wall'.",
+      "learningObjective": "Use 'if' statements with position-based conditions.",
+      "startPosition": { "x": 50, "y": 200, "angle": 0 },
+      "target": { "x": 50, "y": 200, "radius": 15 }
+    },
+    "G4_S1C3": {
+      "title": "If/Else Branching",
+      "goal": "Draw a shape with alternating colors using an if/else statement.",
+      "learningObjective": "Learn to use if/else statements for branching logic.",
+      "startPosition": { "x": 150, "y": 250, "angle": 0 },
+      "target": { "x": 150, "y": 250, "radius": 15 }
     }
   },
   "curriculum": {
@@ -123,7 +172,15 @@
       "2": [], "3": [], "4": [], "5": []
     },
     "2": {
-      "1": ["G2_S1C1", "G2_S1C2"],
+      "1": [],
+      "2": [], "3": [], "4": [], "5": []
+    },
+    "3": {
+      "1": [],
+      "2": [], "3": [], "4": [], "5": []
+    },
+    "4": {
+      "1": [],
       "2": [], "3": [], "4": [], "5": []
     }
   }
