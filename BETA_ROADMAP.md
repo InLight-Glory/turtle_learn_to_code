@@ -24,8 +24,8 @@ Currently, syntax errors (like typos in commands) appear only in the browser con
 
 ### 3. Mobile/Tablet Responsiveness
 Kids often use tablets (iPads/Android).
-- [ ] Verify that the canvas and editor stack correctly on smaller screens.
-- [ ] Ensure touch targets (buttons) are large enough.
+- [x] Verify that the canvas and editor stack correctly on smaller screens.
+- [x] Ensure touch targets (buttons) are large enough.
 
 ### 4. Deployment Guide
 To share with users, the site needs to be hosted.

@@ -143,6 +143,26 @@ body > header, body > main, body > footer {
     /* grid-template-areas will be set by JS */
 }
 
+@media (max-width: 768px) {
+    .challenge-layout {
+        /* Force single column on mobile regardless of JS areas */
+        grid-template-areas:
+            "instructions"
+            "visualization"
+            "editor" !important;
+        grid-template-columns: 1fr !important;
+    }
+
+    .challenge-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .layout-controls {
+        margin-top: 10px;
+    }
+}
+
 .panel { /* Replaces individual container styles */
     background: #fff;
     padding: 20px;
@@ -186,6 +206,9 @@ body > header, body > main, body > footer {
     border-radius: 5px;
     width: 100%;
     height: auto;
+    max-width: 400px; /* Ensure it doesn't blow up on large screens, but shrinks on small */
+    display: block;
+    margin: 0 auto;
 }
 
 /* Navigation Styles */
