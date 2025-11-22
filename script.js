@@ -253,9 +253,51 @@ function initChallengePage() {
 function parseAndExecute(code) {
     reset();
     const lines = code.split('\n');
+    executeLines(lines);
+    render();
+    checkWinCondition();
+}
+
+function executeLines(lines) {
     const commandRegex = /(\w+)\s*\(\s*(.*)\s*\)/;
-    lines.forEach(line => {
-        const match = line.trim().match(commandRegex);
+    const repeatStartRegex = /repeat\s+(\d+)\s*{/;
+    const repeatEndRegex = /}/;
+
+    for (let i = 0; i < lines.length; i++) {
+        let line = lines[i].trim();
+        if (!line) continue;
+
+        // Check for repeat block start
+        const repeatMatch = line.match(repeatStartRegex);
+        if (repeatMatch) {
+            const count = parseInt(repeatMatch[1], 10);
+            const blockLines = [];
+            let depth = 1;
+            i++; // Move to next line
+
+            while (i < lines.length && depth > 0) {
+                let innerLine = lines[i];
+                if (innerLine.trim().match(repeatStartRegex)) {
+                    depth++;
+                } else if (innerLine.trim().match(repeatEndRegex)) {
+                    depth--;
+                }
+
+                if (depth > 0) {
+                    blockLines.push(innerLine);
+                    i++;
+                }
+            }
+
+            // Execute block lines 'count' times
+            for (let k = 0; k < count; k++) {
+                executeLines(blockLines);
+            }
+            continue; // Loop continues after the closing brace
+        }
+
+        // Standard commands
+        const match = line.match(commandRegex);
         if (match) {
             const command = match[1].toLowerCase();
             const args = match[2].trim();
@@ -269,9 +311,7 @@ function parseAndExecute(code) {
             else if (command === 'pendown') penDown();
             else if (command === 'pencolor') penColor(cleanArgs);
         }
-    });
-    render();
-    checkWinCondition();
+    }
 }
 
 // --- Main Execution ---

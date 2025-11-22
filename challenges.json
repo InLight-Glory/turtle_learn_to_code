@@ -72,29 +72,29 @@
     },
     "G1_S1C4": {
       "title": "Introduction to Loops",
-      "goal": "Note: Loops are not yet implemented in the interpreter. Just draw a long line.",
-      "learningObjective": "Placeholder for loop introduction.",
+      "goal": "Use 'repeat 4 { forward(50) }' to draw a line 4 times (for now, just draw a long line).",
+      "learningObjective": "Learn the 'repeat N { ... }' command to repeat actions.",
       "startPosition": { "x": 50, "y": 200, "angle": 0 },
-      "target": { "x": 350, "y": 200, "radius": 15 }
+      "target": { "x": 250, "y": 200, "radius": 15 }
     },
     "G1_S1C5": {
       "title": "Draw a Square with a Loop",
-      "goal": "Note: Loops are not yet implemented. Draw a square manually.",
-      "learningObjective": "Placeholder for loop square.",
+      "goal": "Use 'repeat 4 { forward(100) turn(90) }' to draw a square.",
+      "learningObjective": "Use a loop to draw a regular shape efficiently.",
       "startPosition": { "x": 150, "y": 250, "angle": 0 },
       "target": { "x": 150, "y": 250, "radius": 15 }
     },
     "G1_S1C6": {
       "title": "Looping Colors",
-      "goal": "Draw a multicolor line.",
-      "learningObjective": "Experiment with changing colors frequently.",
+      "goal": "Use a loop to draw 4 lines of different colors (change color inside the loop).",
+      "learningObjective": "Experiment with changing state inside a loop.",
       "startPosition": { "x": 50, "y": 200, "angle": 0 },
       "target": { "x": 350, "y": 200, "radius": 15 }
     },
     "G1_S1C7": {
       "title": "Nested Loops",
-      "goal": "Complex pattern placeholder.",
-      "learningObjective": "Advanced concepts placeholder.",
+      "goal": "Try using a loop inside another loop! (e.g. repeat 4 { repeat 3 { ... } }).",
+      "learningObjective": "Advanced concepts: Nested loops.",
       "startPosition": { "x": 200, "y": 200, "angle": 0 },
       "target": { "x": 200, "y": 200, "radius": 15 }
     },
