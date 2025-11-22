@@ -1,20 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coding Challenge - Level 1</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <header>
         <div class="container">
             <h1>Coding Champions</h1>
             <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="challenge.html">Challenges</a></li>
-            </ul>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="challenge.html">Challenges</a></li>
+                </ul>
             </nav>
         </div>
     </header>
@@ -25,7 +27,9 @@
                 <div class="layout-controls">
                     <label for="layout-select">Layout:</label>
                     <select id="layout-select">
-                        <!-- Options will be populated by JS -->
+                        <option value="default">Default View</option>
+                        <option value="focus-code">Focus on Code</option>
+                        <option value="side-by-side">Side-by-Side</option>
                     </select>
                 </div>
             </div>
@@ -54,6 +58,9 @@
             <p>&copy; 2025 Coding Champions</p>
         </div>
     </footer>
+    <script src="progress.js"></script>
+    <script src="data.js"></script>
     <script src="script.js"></script>
 </body>
+
 </html>
