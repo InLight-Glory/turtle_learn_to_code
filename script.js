@@ -184,7 +184,7 @@ function populateSetButtons(grade) {
 
 function initIndexPage() {
     const gradeSelection = document.getElementById('grade-selection');
-    const gradeOrder = ['K', '1', '2'];
+    const gradeOrder = ['1', '2', '3', '4', '5'];
 
     gradeOrder.forEach((grade, index) => {
         if (!ALL_DATA.curriculum[grade]) return;
@@ -236,7 +236,7 @@ function initChallengePage() {
     ctx = canvas.getContext('2d');
 
     const urlParams = new URLSearchParams(window.location.search);
-    const challengeId = urlParams.get('id') || 'K_S1C1';
+    const challengeId = urlParams.get('id') || 'G1_S1C1';
     loadChallenge(challengeId);
     initLayoutSwitcher();
     initModal();
