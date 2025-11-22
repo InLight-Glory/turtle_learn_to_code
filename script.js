@@ -99,7 +99,28 @@ function checkWinCondition() {
             completed.push(id);
             localStorage.setItem('completedChallenges', JSON.stringify(completed));
         }
-        setTimeout(() => alert("Congratulations! You completed the challenge!"), 100);
+        showWinModal();
+    }
+}
+
+function showWinModal() {
+    const modal = document.getElementById('win-modal');
+    if (modal) {
+        modal.classList.add('show');
+        // Add fireworks or celebration sound here later?
+    } else {
+        alert("Congratulations! You completed the challenge!");
+    }
+}
+
+function initModal() {
+    const modal = document.getElementById('win-modal');
+    const closeBtn = document.getElementById('close-modal-btn');
+    if (modal && closeBtn) {
+        closeBtn.onclick = () => {
+            modal.classList.remove('show');
+            window.location.href = 'index.html'; // Return to menu on close
+        };
     }
 }
 
@@ -218,6 +239,7 @@ function initChallengePage() {
     const challengeId = urlParams.get('id') || 'K_S1C1';
     loadChallenge(challengeId);
     initLayoutSwitcher();
+    initModal();
 
     const runCodeBtn = document.getElementById('run-code-btn');
     if (runCodeBtn) {
