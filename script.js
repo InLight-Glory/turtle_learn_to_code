@@ -3,7 +3,7 @@ console.log("Welcome to the Coding Challenge site!");
 // --- Global App State ---
 let ALL_DATA = {}; // Will be populated by fetching json files
 const state = {
-    turtle: { x: 0, y: 0, angle: 0, penDown: true },
+    turtle: { x: 0, y: 0, angle: 0, penDown: true, color: 'black' },
     lines: [],
     currentChallenge: null
 };
@@ -30,7 +30,7 @@ function render() {
         ctx.beginPath();
         ctx.moveTo(line.from.x, line.from.y);
         ctx.lineTo(line.to.x, line.to.y);
-        ctx.strokeStyle = 'black';
+        ctx.strokeStyle = line.color || 'black';
         ctx.stroke();
     });
 
@@ -51,6 +51,8 @@ function reset() {
     state.turtle.x = start.x;
     state.turtle.y = start.y;
     state.turtle.angle = start.angle;
+    state.turtle.penDown = true;
+    state.turtle.color = 'black';
     state.lines = [];
     render();
 }
@@ -60,7 +62,11 @@ function forward(distance) {
     const newX = state.turtle.x + distance * Math.cos(angleInRadians);
     const newY = state.turtle.y + distance * Math.sin(angleInRadians);
     if (state.turtle.penDown) {
-        state.lines.push({ from: { x: state.turtle.x, y: state.turtle.y }, to: { x: newX, y: newY } });
+        state.lines.push({
+            from: { x: state.turtle.x, y: state.turtle.y },
+            to: { x: newX, y: newY },
+            color: state.turtle.color
+        });
     }
     state.turtle.x = newX;
     state.turtle.y = newY;
@@ -68,6 +74,18 @@ function forward(distance) {
 
 function turn(degrees) {
     state.turtle.angle += degrees;
+}
+
+function penUp() {
+    state.turtle.penDown = false;
+}
+
+function penDown() {
+    state.turtle.penDown = true;
+}
+
+function penColor(color) {
+    state.turtle.color = color;
 }
 
 function checkWinCondition() {
@@ -213,14 +231,21 @@ function initChallengePage() {
 function parseAndExecute(code) {
     reset();
     const lines = code.split('\n');
-    const commandRegex = /(\w+)\s*\(\s*(-?\d+)\s*\)/;
+    const commandRegex = /(\w+)\s*\(\s*(.*)\s*\)/;
     lines.forEach(line => {
         const match = line.trim().match(commandRegex);
         if (match) {
-            const command = match[1].toLowerCase();
-            const value = parseInt(match[2], 10);
-            if (command === 'forward') forward(value);
-            else if (command === 'turn') turn(value);
+            const command = match[1]; // Keep case for command name check, or lower it
+            const args = match[2].trim();
+
+            // Remove quotes if present for string args
+            const cleanArgs = args.replace(/^["']|["']$/g, '');
+
+            if (command === 'forward') forward(parseInt(cleanArgs, 10));
+            else if (command === 'turn') turn(parseInt(cleanArgs, 10));
+            else if (command === 'penUp') penUp();
+            else if (command === 'penDown') penDown();
+            else if (command === 'penColor') penColor(cleanArgs);
         }
     });
     render();
