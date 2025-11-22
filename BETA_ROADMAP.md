@@ -14,13 +14,13 @@ This document outlines the final steps required to polish **Coding Champions** f
 
 ### 1. Implement Loops (High Priority)
 The curriculum for Grade 1 includes "Introduction to Loops", but the interpreter currently does not support them.
-- [ ] Update `script.js` parser to support `repeat N { ... }` syntax.
-- [ ] Update `challenges.json` to use actual loops in the goals/examples for G1_S1C4+.
+- [x] Update `script.js` parser to support `repeat N { ... }` syntax.
+- [x] Update `challenges.json` to use actual loops in the goals/examples for G1_S1C4+.
 
 ### 2. User-Facing Error Handling
 Currently, syntax errors (like typos in commands) appear only in the browser console. Kids won't see them.
-- [ ] Catch errors in `parseAndExecute`.
-- [ ] Display a friendly error message (e.g., "I don't understand 'fwd'. Did you mean 'forward'?") in the UI (e.g., in a toast or above the editor).
+- [x] Catch errors in `parseAndExecute`.
+- [x] Display a friendly error message (e.g., "I don't understand 'fwd'. Did you mean 'forward'?") in the UI (e.g., in a toast or above the editor).
 
 ### 3. Mobile/Tablet Responsiveness
 Kids often use tablets (iPads/Android).

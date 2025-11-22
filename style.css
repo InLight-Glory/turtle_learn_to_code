@@ -352,3 +352,15 @@ nav ul li a:hover {
 .modal-btn:hover {
     background-color: #2980b9;
 }
+
+/* Error Message Styles */
+#error-message {
+    background-color: #ffdddd;
+    color: #d8000c;
+    border: 1px solid #d8000c;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    font-size: 0.9em;
+    font-weight: bold;
+}

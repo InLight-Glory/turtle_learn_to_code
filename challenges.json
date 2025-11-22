@@ -72,14 +72,14 @@
     },
     "G1_S1C4": {
       "title": "Introduction to Loops",
-      "goal": "Use 'repeat 4 { forward(50) }' to draw a line 4 times (for now, just draw a long line).",
+      "goal": "Use 'repeat 4 {<br>&nbsp;&nbsp;forward(50)<br>}' to draw a line 4 times (for now, just draw a long line).",
       "learningObjective": "Learn the 'repeat N { ... }' command to repeat actions.",
       "startPosition": { "x": 50, "y": 200, "angle": 0 },
       "target": { "x": 250, "y": 200, "radius": 15 }
     },
     "G1_S1C5": {
       "title": "Draw a Square with a Loop",
-      "goal": "Use 'repeat 4 { forward(100) turn(90) }' to draw a square.",
+      "goal": "Use 'repeat 4 {<br>&nbsp;&nbsp;forward(100)<br>&nbsp;&nbsp;turn(90)<br>}' to draw a square.",
       "learningObjective": "Use a loop to draw a regular shape efficiently.",
       "startPosition": { "x": 150, "y": 250, "angle": 0 },
       "target": { "x": 150, "y": 250, "radius": 15 }

@@ -252,10 +252,31 @@ function initChallengePage() {
 
 function parseAndExecute(code) {
     reset();
+    clearError();
     const lines = code.split('\n');
-    executeLines(lines);
-    render();
-    checkWinCondition();
+    try {
+        executeLines(lines);
+        render();
+        checkWinCondition();
+    } catch (e) {
+        showError(e.message);
+    }
+}
+
+function showError(msg) {
+    const errEl = document.getElementById('error-message');
+    if (errEl) {
+        errEl.textContent = msg;
+        errEl.style.display = 'block';
+    }
+}
+
+function clearError() {
+    const errEl = document.getElementById('error-message');
+    if (errEl) {
+        errEl.style.display = 'none';
+        errEl.textContent = '';
+    }
 }
 
 function executeLines(lines) {
@@ -310,6 +331,11 @@ function executeLines(lines) {
             else if (command === 'penup') penUp();
             else if (command === 'pendown') penDown();
             else if (command === 'pencolor') penColor(cleanArgs);
+            else {
+                throw new Error(`I don't know the command '${command}'.`);
+            }
+        } else {
+            throw new Error(`I don't understand this line: "${line}". Check your spelling or parentheses.`);
         }
     }
 }
