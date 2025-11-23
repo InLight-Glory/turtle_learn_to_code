@@ -1,10 +1,13 @@
 console.log("Welcome to the Coding Challenge site!");
 
 // --- Global App State ---
-let ALL_DATA = {}; // Will be populated by fetching json files
+// ALL_DATA is loaded from data.js
+let ALL_DATA = window.ALL_DATA || {};
 const state = {
     turtle: { x: 0, y: 0, angle: 0, penDown: true, color: 'black' },
     lines: [],
+    functions: {},
+    vars: {},
     currentChallenge: null
 };
 let ctx;
@@ -54,6 +57,8 @@ function reset() {
     state.turtle.penDown = true;
     state.turtle.color = 'black';
     state.lines = [];
+    state.functions = {};
+    state.vars = {};
     render();
 }
 
@@ -184,7 +189,7 @@ function populateSetButtons(grade) {
 
 function initIndexPage() {
     const gradeSelection = document.getElementById('grade-selection');
-    const gradeOrder = ['1', '2', '3', '4', '5'];
+    const gradeOrder = ['K', '1', '2', '3', '4', '5'];
 
     gradeOrder.forEach((grade, index) => {
         if (!ALL_DATA.curriculum[grade]) return;
@@ -279,28 +284,75 @@ function clearError() {
     }
 }
 
-function executeLines(lines) {
+function executeLines(lines, argsMap = {}) {
     const commandRegex = /(\w+)\s*\(\s*(.*)\s*\)/;
     const repeatStartRegex = /repeat\s+(\d+)\s*{/;
-    const repeatEndRegex = /}/;
+    const ifStartRegex = /if\s*\((.+)\)\s*{/;
+    const functionStartRegex = /function\s+(\w+)\s*\((.*)\)\s*{/;
+    const varRegex = /var\s+(\w+)\s*=\s*(.*)/;
+    const endBlockRegex = /}/;
+
+    // Pre-pass to define functions?
+    // Or just handle definitions as we encounter them (hoisting might be too complex for now).
+    // Let's handle definitions as we see them.
 
     for (let i = 0; i < lines.length; i++) {
         let line = lines[i].trim();
         if (!line) continue;
 
-        // Check for repeat block start
+        // Check for Variable Definition
+        const varMatch = line.match(varRegex);
+        if (varMatch) {
+            const varName = varMatch[1];
+            let value = varMatch[2];
+            // Resolve value if it's another variable or param
+            if (argsMap[value] !== undefined) value = argsMap[value];
+            else if (state.vars[value] !== undefined) value = state.vars[value];
+
+            state.vars[varName] = value;
+            continue;
+        }
+
+        // Check for Function Definition
+        const funcMatch = line.match(functionStartRegex);
+        if (funcMatch) {
+            const funcName = funcMatch[1];
+            const params = funcMatch[2].split(',').map(p => p.trim()).filter(p => p);
+            const blockLines = [];
+            let depth = 1;
+            i++;
+
+            while (i < lines.length && depth > 0) {
+                let innerLine = lines[i];
+                // Check for nested blocks (loops or other functions? Nested functions not supported yet)
+                if (innerLine.trim().match(repeatStartRegex) || innerLine.trim().match(functionStartRegex)) {
+                    depth++;
+                } else if (innerLine.trim().match(endBlockRegex)) {
+                    depth--;
+                }
+
+                if (depth > 0) {
+                    blockLines.push(innerLine);
+                    i++;
+                }
+            }
+            state.functions[funcName] = { lines: blockLines, params: params };
+            continue;
+        }
+
+        // Check for Repeat Loop
         const repeatMatch = line.match(repeatStartRegex);
         if (repeatMatch) {
             const count = parseInt(repeatMatch[1], 10);
             const blockLines = [];
             let depth = 1;
-            i++; // Move to next line
+            i++;
 
             while (i < lines.length && depth > 0) {
                 let innerLine = lines[i];
-                if (innerLine.trim().match(repeatStartRegex)) {
+                if (innerLine.trim().match(repeatStartRegex) || innerLine.trim().match(ifStartRegex) || innerLine.trim().match(functionStartRegex)) {
                     depth++;
-                } else if (innerLine.trim().match(repeatEndRegex)) {
+                } else if (innerLine.trim().match(endBlockRegex)) {
                     depth--;
                 }
 
@@ -310,31 +362,114 @@ function executeLines(lines) {
                 }
             }
 
-            // Execute block lines 'count' times
             for (let k = 0; k < count; k++) {
-                executeLines(blockLines);
+                executeLines(blockLines, argsMap);
             }
-            continue; // Loop continues after the closing brace
+            continue;
         }
 
-        // Standard commands
+        // Check for If Condition
+        const ifMatch = line.match(ifStartRegex);
+        if (ifMatch) {
+            let conditionStr = ifMatch[1];
+            // Resolve variables in condition (simple regex replace for known vars)
+            // A proper parser would be better, but we'll do simple substitution for now.
+            Object.keys(state.vars).forEach(v => {
+                const regex = new RegExp(`\\b${v}\\b`, 'g');
+                conditionStr = conditionStr.replace(regex, state.vars[v]);
+            });
+            Object.keys(argsMap).forEach(v => {
+                const regex = new RegExp(`\\b${v}\\b`, 'g');
+                conditionStr = conditionStr.replace(regex, argsMap[v]);
+            });
+
+            // Safe eval (sort of) - only allow math and comparisons
+            // NOTE: This is a security risk in a real app, but acceptable for this contained sandbox environment?
+            // Let's implement a safer evaluator for numbers and basic operators.
+            let conditionResult = false;
+            try {
+                // Sanitize: allow numbers, operators, parens, true/false
+                if (/^[\d\s+\-*/<>=!&|()truefalse.]+$/.test(conditionStr)) {
+                    // eslint-disable-next-line no-new-func
+                    conditionResult = new Function('return ' + conditionStr)();
+                }
+            } catch (e) {
+                console.warn("Condition parse error", e);
+            }
+
+            const blockLines = [];
+            let depth = 1;
+            i++;
+
+            while (i < lines.length && depth > 0) {
+                let innerLine = lines[i];
+                if (innerLine.trim().match(repeatStartRegex) || innerLine.trim().match(ifStartRegex) || innerLine.trim().match(functionStartRegex)) {
+                    depth++;
+                } else if (innerLine.trim().match(endBlockRegex)) {
+                    depth--;
+                }
+
+                if (depth > 0) {
+                    blockLines.push(innerLine);
+                    i++;
+                }
+            }
+
+            if (conditionResult) {
+                executeLines(blockLines, argsMap);
+            }
+            continue;
+        }
+
+        // Standard commands or Function Calls
         const match = line.match(commandRegex);
         if (match) {
-            const command = match[1].toLowerCase();
-            const args = match[2].trim();
+            const command = match[1]; // Case sensitive for function names? Let's make commands case-insensitive but functions strict or loose.
+            // Let's try lower case for commands, but keep original for function check if needed.
+            const lowerCommand = command.toLowerCase();
+            let args = match[2].trim();
 
-            // Remove quotes if present for string args
+            // Substitute variables/params
+            if (argsMap[args] !== undefined) {
+                args = String(argsMap[args]);
+            } else if (state.vars[args] !== undefined) {
+                args = String(state.vars[args]);
+            }
+
             const cleanArgs = args.replace(/^["']|["']$/g, '');
 
-            if (command === 'forward') forward(parseInt(cleanArgs, 10));
-            else if (command === 'turn') turn(parseInt(cleanArgs, 10));
-            else if (command === 'penup') penUp();
-            else if (command === 'pendown') penDown();
-            else if (command === 'pencolor') penColor(cleanArgs);
+            if (lowerCommand === 'forward') forward(parseInt(cleanArgs, 10));
+            else if (lowerCommand === 'turn') turn(parseInt(cleanArgs, 10));
+            else if (lowerCommand === 'penup') penUp();
+            else if (lowerCommand === 'pendown') penDown();
+            else if (lowerCommand === 'pencolor') penColor(cleanArgs);
+            else if (state.functions[command]) {
+                // Execute User Function
+                const funcDef = state.functions[command];
+                // Handle new style {lines, params} or old style [lines] just in case
+                // But we are overwriting, so assume new style.
+
+                if (Array.isArray(funcDef)) {
+                    // Fallback if somehow old format persists (shouldn't happen with clean reload)
+                    executeLines(funcDef, argsMap);
+                } else {
+                    const callArgs = cleanArgs.split(',').map(a => a.trim());
+                    const newArgsMap = {};
+                    funcDef.params.forEach((param, index) => {
+                        // resolve argument if it's a variable in current scope
+                        let val = callArgs[index];
+                        if (argsMap[val] !== undefined) val = argsMap[val];
+                        newArgsMap[param] = val;
+                    });
+                    executeLines(funcDef.lines, newArgsMap);
+                }
+            }
             else {
                 throw new Error(`I don't know the command '${command}'.`);
             }
         } else {
+            // Ignore closing braces that might be lingering from sloppy parsing?
+            if (line === '}') continue;
             throw new Error(`I don't understand this line: "${line}". Check your spelling or parentheses.`);
         }
     }
@@ -342,22 +477,21 @@ function executeLines(lines) {
 
 // --- Main Execution ---
 function main() {
-    const challengeDataPromise = fetch('challenges.json').then(res => res.json());
-    const layoutDataPromise = fetch('layouts.json').then(res => res.json());
+    // Wait for DOM content loaded if script runs before DOM
+    if (!window.ALL_DATA) {
+        console.error("ALL_DATA not found. Ensure data.js is loaded.");
+        return;
+    }
+    ALL_DATA = window.ALL_DATA;
 
-    Promise.all([challengeDataPromise, layoutDataPromise])
-        .then(([challengeData, layoutData]) => {
-            ALL_DATA = { ...challengeData, layouts: layoutData };
-
-            if (document.getElementById('challenge-selection')) {
-                initIndexPage();
-            } else if (document.querySelector('.challenge-layout')) {
-                initChallengePage();
-            }
-        })
-        .catch(error => {
-            console.error('Error loading data:', error);
-        });
+    if (document.getElementById('challenge-selection')) {
+        initIndexPage();
+    } else if (document.querySelector('.challenge-layout')) {
+        initChallengePage();
+    }
 }
 
-main(); // Run the application
+// If script is deferred, main runs immediately.
+// If script is sync at bottom of body, it also runs immediately.
+// But data.js must be loaded first.
+main();
