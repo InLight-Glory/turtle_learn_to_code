@@ -223,6 +223,14 @@ function initLayoutSwitcher() {
         const layout = ALL_DATA.layouts[selectedLayoutKey];
         if (layout) {
             challengeLayout.style.gridTemplateAreas = layout.areas.join(' ');
+
+            // Toggle full-width class for side-by-side layout
+            const mainEl = document.querySelector('main');
+            if (selectedLayoutKey === 'side-by-side') {
+                mainEl.classList.add('layout-full-width');
+            } else {
+                mainEl.classList.remove('layout-full-width');
+            }
         }
     };
 
@@ -231,6 +239,10 @@ function initLayoutSwitcher() {
         const defaultOption = layoutSelect.querySelector('option[value="default"]');
         if (defaultOption) defaultOption.selected = true;
         challengeLayout.style.gridTemplateAreas = ALL_DATA.layouts.default.areas.join(' ');
+
+        // Ensure class is unset initially if default is not side-by-side
+        const mainEl = document.querySelector('main');
+        if (mainEl) mainEl.classList.remove('layout-full-width');
     }
 }
 

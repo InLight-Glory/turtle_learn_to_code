@@ -115,6 +115,11 @@ body > header, body > main, body > footer {
         width: 80%;
         margin: 0 auto;
     }
+
+    main.layout-full-width {
+        width: 95%;
+        max-width: none;
+    }
 }
 
 /* Challenge Page Specific Styles */
@@ -141,6 +146,11 @@ body > header, body > main, body > footer {
     display: grid;
     gap: 20px;
     /* grid-template-areas will be set by JS */
+}
+
+/* Specific grid columns for side-by-side to ensure equal distribution */
+.layout-full-width .challenge-layout {
+    grid-template-columns: 1fr 1fr 1fr;
 }
 
 @media (max-width: 768px) {
