@@ -18,11 +18,11 @@ This roadmap outlines the current status of the project and the planned next ste
 - **Dynamic Curriculum UI:** The landing page features a UI to select Grades and Sets, which dynamically displays the available challenges from the JSON data.
 - **Customizable Layouts:** The challenge page includes a dropdown to dynamically change the page layout using CSS Grid.
 
-### ⏳ Phase 2: Enhancing the User Experience (Next Steps)
-- **Client-Side Progress Tracking:** Use the browser's `localStorage` to save a user's progress, marking which challenges they have completed.
-- **Improved Code Editor:** Integrate a more advanced code editor library (e.g., CodeMirror, Ace) to provide syntax highlighting and a better user experience.
-- **Expanded Turtle Command Set:** Implement more advanced turtle commands (e.g., `penUp`, `penDown`, `setColor`) to support a wider variety of challenges.
-- **Full Curriculum Content:** Flesh out the `challenges.json` file with the complete set of challenges for all defined grades and sets.
+### ✅ Phase 2: Enhancing the User Experience (Complete)
+- **Client-Side Progress Tracking:** Implemented using `localStorage` to save user progress and visually mark completed challenges.
+- **Expanded Turtle Command Set:** Implemented advanced commands including `penUp`, `penDown`, `penColor`, and loops (`repeat`).
+- **Curriculum Content:** Curriculum expanded to cover Grades K-5 with support for Functions, Variables, and Conditionals.
+- **Note on Code Editor:** Decision made to stick with a standard HTML `<textarea>` to avoid external dependencies, prioritizing stability and simplicity.
 
 ### 未来 Phase 3: Future Backend Integration (Future)
 - **User Accounts:** Implement user registration and login.

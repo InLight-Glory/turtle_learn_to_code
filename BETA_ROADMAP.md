@@ -29,7 +29,7 @@ Kids often use tablets (iPads/Android).
 
 ### 4. Deployment Guide
 To share with users, the site needs to be hosted.
-- [ ] Add a `DEPLOY.md` or section in `readme.md` explaining how to publish to GitHub Pages or Netlify.
+- [x] Add a `DEPLOY.md` or section in `readme.md` explaining how to publish to GitHub Pages or Netlify.
 
 ### 5. Analytics (Optional for Beta)
 - [ ] Add basic tracking (anonymous) to see which levels users get stuck on? (Maybe defer to v1.0).
