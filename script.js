@@ -42,8 +42,16 @@ function render() {
     const canvasHeight = canvas ? canvas.height : 400;
     let clampedX = Math.max(0, Math.min(state.turtle.x, canvasWidth));
     let clampedY = Math.max(0, Math.min(state.turtle.y, canvasHeight));
-    turtleIcon.style.left = `${clampedX}px`;
-    turtleIcon.style.top = `${clampedY}px`;
+
+    // Get the actual displayed size of the canvas to calculate scale
+    const displayedWidth = canvas ? canvas.offsetWidth : canvasWidth;
+    const displayedHeight = canvas ? canvas.offsetHeight : canvasHeight;
+    const scaleX = displayedWidth / canvasWidth;
+    const scaleY = displayedHeight / canvasHeight;
+
+    // Position turtle icon relative to the displayed canvas size
+    turtleIcon.style.left = `${clampedX * scaleX}px`;
+    turtleIcon.style.top = `${clampedY * scaleY}px`;
     turtleIcon.style.transform = `translate(-50%, -50%) rotate(${state.turtle.angle + 90}deg)`;
 }
 
@@ -231,6 +239,9 @@ function initLayoutSwitcher() {
             } else {
                 mainEl.classList.remove('layout-full-width');
             }
+
+            // Force re-render to update turtle position based on new canvas size/position
+            setTimeout(render, 0);
         }
     };
 

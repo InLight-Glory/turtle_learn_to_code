@@ -22,7 +22,7 @@ const DATA_CHALLENGES = {
             "startPosition": {
                 "x": 200,
                 "y": 350,
-                "angle": -90
+                "angle": 0
             },
             "target": {
                 "x": 200,
