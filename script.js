@@ -8,10 +8,180 @@ const state = {
     lines: [],
     functions: {},
     vars: {},
-    currentChallenge: null
+    currentChallenge: null,
+    projectContext: null,
+    lastWin: null
 };
 let ctx;
 let turtleIcon;
+
+// --- Persistence (localStorage) ---
+const STORAGE_KEYS = {
+    completedChallengesLegacy: 'completedChallenges',
+    completedChallenges: 'cc_completedChallenges_v1',
+    wallet: 'cc_wallet_v1',
+    profile: 'cc_profile_v1',
+    inventory: 'cc_inventory_v1',
+    equipped: 'cc_equipped_v1',
+    projectProgress: 'cc_projectProgress_v1'
+};
+
+function readJson(key, fallback) {
+    try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return fallback;
+        return JSON.parse(raw);
+    } catch {
+        return fallback;
+    }
+}
+
+function writeJson(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+}
+
+function getCompletedChallenges() {
+    return readJson(STORAGE_KEYS.completedChallenges, []);
+}
+
+function setCompletedChallenges(ids) {
+    writeJson(STORAGE_KEYS.completedChallenges, ids);
+}
+
+function getWallet() {
+    const wallet = readJson(STORAGE_KEYS.wallet, null);
+    if (wallet && typeof wallet.points === 'number') return wallet;
+    const fresh = { points: 0, lifetimePoints: 0 };
+    writeJson(STORAGE_KEYS.wallet, fresh);
+    return fresh;
+}
+
+function setWallet(wallet) {
+    writeJson(STORAGE_KEYS.wallet, wallet);
+    updateHeaderStatus();
+}
+
+function addPoints(amount) {
+    const wallet = getWallet();
+    wallet.points += amount;
+    wallet.lifetimePoints += Math.max(0, amount);
+    setWallet(wallet);
+}
+
+function spendPoints(amount) {
+    const wallet = getWallet();
+    if (wallet.points < amount) return false;
+    wallet.points -= amount;
+    setWallet(wallet);
+    return true;
+}
+
+function getProfile() {
+    const profile = readJson(STORAGE_KEYS.profile, null);
+    if (profile && typeof profile.displayName === 'string') return profile;
+    const fresh = { displayName: 'Coder Turtle' };
+    writeJson(STORAGE_KEYS.profile, fresh);
+    return fresh;
+}
+
+function setProfile(profile) {
+    writeJson(STORAGE_KEYS.profile, profile);
+    updateHeaderStatus();
+}
+
+function getInventory() {
+    const inv = readJson(STORAGE_KEYS.inventory, null);
+    if (inv && typeof inv === 'object') return inv;
+    const fresh = {};
+    writeJson(STORAGE_KEYS.inventory, fresh);
+    return fresh;
+}
+
+function setInventory(inv) {
+    writeJson(STORAGE_KEYS.inventory, inv);
+}
+
+function isOwned(itemId) {
+    const inv = getInventory();
+    return !!inv[itemId];
+}
+
+function grantItem(itemId) {
+    const inv = getInventory();
+    if (!inv[itemId]) {
+        inv[itemId] = { ownedAt: new Date().toISOString() };
+        setInventory(inv);
+    }
+}
+
+function getEquipped() {
+    const eq = readJson(STORAGE_KEYS.equipped, null);
+    if (eq && typeof eq === 'object') return eq;
+    const fresh = { background: 'bg_none', hat: 'hat_none', shell: 'shell_none' };
+    writeJson(STORAGE_KEYS.equipped, fresh);
+    return fresh;
+}
+
+function setEquipped(eq) {
+    writeJson(STORAGE_KEYS.equipped, eq);
+    updateHeaderStatus();
+}
+
+function getProjectProgress() {
+    const pp = readJson(STORAGE_KEYS.projectProgress, null);
+    if (pp && typeof pp === 'object') return pp;
+    const fresh = {};
+    writeJson(STORAGE_KEYS.projectProgress, fresh);
+    return fresh;
+}
+
+function setProjectProgress(pp) {
+    writeJson(STORAGE_KEYS.projectProgress, pp);
+}
+
+function getShopItems() {
+    return (ALL_DATA.shop && Array.isArray(ALL_DATA.shop.items)) ? ALL_DATA.shop.items : [];
+}
+
+function getShopItem(itemId) {
+    return getShopItems().find(i => i.id === itemId);
+}
+
+function getProject(projectId) {
+    return (ALL_DATA.projects || []).find(p => p.id === projectId);
+}
+
+function ensureStarterData() {
+    // Migrate legacy completion key if present.
+    const legacy = readJson(STORAGE_KEYS.completedChallengesLegacy, null);
+    if (Array.isArray(legacy) && legacy.length && !getCompletedChallenges().length) {
+        setCompletedChallenges(legacy);
+    }
+
+    getWallet();
+    getProfile();
+    getInventory();
+    getEquipped();
+    getProjectProgress();
+
+    // Ensure starter inventory.
+    const starter = (ALL_DATA.shop && Array.isArray(ALL_DATA.shop.starterInventory)) ? ALL_DATA.shop.starterInventory : [];
+    starter.forEach(id => grantItem(id));
+}
+
+function updateHeaderStatus() {
+    const wallet = getWallet();
+    const pointsEls = document.querySelectorAll('#header-points');
+    pointsEls.forEach(el => (el.textContent = String(wallet.points)));
+
+    const eq = getEquipped();
+    const hat = getShopItem(eq.hat);
+    const avatarEls = document.querySelectorAll('#header-avatar');
+    avatarEls.forEach(el => {
+        const hatEmoji = hat && hat.emoji && eq.hat !== 'hat_none' ? hat.emoji : '🐢';
+        el.textContent = hatEmoji;
+    });
+}
 
 // --- Render Engine ---
 function render() {
@@ -107,19 +277,113 @@ function checkWinCondition() {
     const distance = Math.sqrt(Math.pow(state.turtle.x - target.x, 2) + Math.pow(state.turtle.y - target.y, 2));
     if (distance < target.radius) {
         const id = state.currentChallenge.id;
-        let completed = JSON.parse(localStorage.getItem('completedChallenges') || '[]');
-        if (!completed.includes(id)) {
+        const completed = getCompletedChallenges();
+        const wasNewCompletion = !completed.includes(id);
+        let pointsAwarded = 0;
+        if (wasNewCompletion) {
             completed.push(id);
-            localStorage.setItem('completedChallenges', JSON.stringify(completed));
+            setCompletedChallenges(completed);
+            pointsAwarded = estimateChallengePoints(id);
+            addPoints(pointsAwarded);
         }
+
+        let projectReward = null;
+        if (state.projectContext) {
+            projectReward = markProjectStepComplete(state.projectContext.projectId, state.projectContext.stepIndex);
+        }
+
+        state.lastWin = {
+            challengeId: id,
+            pointsAwarded,
+            projectReward,
+            balance: getWallet().points
+        };
         showWinModal();
     }
 }
 
+function estimateChallengePoints(challengeId) {
+    const ch = ALL_DATA.challenges && ALL_DATA.challenges[challengeId];
+    if (ch && typeof ch.points === 'number') return ch.points;
+
+    // Fallback: scale by grade prefix.
+    const gradePrefix = (challengeId || '').split('_')[0];
+    if (gradePrefix === 'K') return 5;
+    if (gradePrefix === 'G1' || gradePrefix === '1') return 8;
+    if (gradePrefix === 'G2' || gradePrefix === '2') return 10;
+    if (gradePrefix === 'G3' || gradePrefix === '3') return 14;
+    if (gradePrefix === 'G4' || gradePrefix === '4') return 18;
+    if (gradePrefix === 'G5' || gradePrefix === '5') return 22;
+    return 10;
+}
+
+function grantReward(reward) {
+    if (!reward) return;
+    if (typeof reward.points === 'number' && reward.points > 0) addPoints(reward.points);
+    if (Array.isArray(reward.grantItemIds)) reward.grantItemIds.forEach(id => grantItem(id));
+}
+
+function markProjectStepComplete(projectId, stepIndex) {
+    const project = getProject(projectId);
+    if (!project) return;
+
+    const pp = getProjectProgress();
+    const current = pp[projectId] || { completedSteps: [], rewardedAt: null, completedAt: null };
+    const steps = Array.isArray(current.completedSteps) ? current.completedSteps : [];
+    if (!steps.includes(stepIndex)) steps.push(stepIndex);
+    current.completedSteps = steps.sort((a, b) => a - b);
+
+    const allComplete = project.steps.every((_, idx) => current.completedSteps.includes(idx));
+    const shouldReward = allComplete && !current.rewardedAt;
+    if (shouldReward) {
+        current.completedAt = current.completedAt || new Date().toISOString();
+        current.rewardedAt = new Date().toISOString();
+        grantReward(project.reward);
+    }
+
+    pp[projectId] = current;
+    setProjectProgress(pp);
+
+    return shouldReward ? project.reward : null;
+}
+
 function showWinModal() {
     const modal = document.getElementById('win-modal');
+    const nextBtn = document.getElementById('next-step-btn');
+    const rewardEl = document.getElementById('win-reward-text');
     if (modal) {
         modal.classList.add('show');
+
+        if (rewardEl) {
+            const points = state.lastWin && typeof state.lastWin.pointsAwarded === 'number' ? state.lastWin.pointsAwarded : 0;
+            const projectReward = state.lastWin ? state.lastWin.projectReward : null;
+            const bonus = projectReward && typeof projectReward.points === 'number' ? projectReward.points : 0;
+            const total = points + bonus;
+            rewardEl.textContent = total ? `+${total} pts (Balance: ${getWallet().points})` : '';
+        }
+
+        if (nextBtn) {
+            if (state.projectContext) {
+                const { projectId, stepIndex } = state.projectContext;
+                const project = getProject(projectId);
+                const nextIndex = stepIndex + 1;
+                if (project && nextIndex < project.steps.length) {
+                    nextBtn.style.display = 'inline-block';
+                    nextBtn.textContent = 'Next Step';
+                    nextBtn.href = `challenge.html?project=${encodeURIComponent(projectId)}&step=${nextIndex}`;
+                } else if (project) {
+                    nextBtn.style.display = 'inline-block';
+                    nextBtn.textContent = 'Finish Project';
+                    nextBtn.href = 'projects.html';
+                } else {
+                    nextBtn.style.display = 'none';
+                    nextBtn.href = '#';
+                }
+            } else {
+                nextBtn.style.display = 'none';
+                nextBtn.href = '#';
+            }
+        }
         // Add fireworks or celebration sound here later?
     } else {
         alert("Congratulations! You completed the challenge!");
@@ -129,10 +393,17 @@ function showWinModal() {
 function initModal() {
     const modal = document.getElementById('win-modal');
     const closeBtn = document.getElementById('close-modal-btn');
+    const nextBtn = document.getElementById('next-step-btn');
     if (modal && closeBtn) {
         closeBtn.onclick = () => {
             modal.classList.remove('show');
-            window.location.href = 'index.html'; // Return to menu on close
+            window.location.href = state.projectContext ? 'projects.html' : 'index.html'; // Return to menu on close
+        };
+    }
+
+    if (nextBtn) {
+        nextBtn.onclick = (e) => {
+            if (nextBtn.getAttribute('href') === '#') e.preventDefault();
         };
     }
 }
@@ -158,14 +429,21 @@ function populateChallengeList(grade, set) {
     const challengeIds = ALL_DATA.curriculum[grade][set];
     if (!challengeIds) return;
 
-    const completed = JSON.parse(localStorage.getItem('completedChallenges') || '[]');
+    const completed = getCompletedChallenges();
 
     challengeIds.forEach(id => {
         const challenge = ALL_DATA.challenges[id];
         if (challenge) {
             const link = document.createElement('a');
             link.href = `challenge.html?id=${id}`;
-            link.innerHTML = `<h4>${challenge.title}</h4><p>${challenge.goal || ''}</p>`;
+
+            const title = document.createElement('h4');
+            title.textContent = challenge.title;
+            const goal = document.createElement('p');
+            goal.textContent = challenge.goal || '';
+            link.appendChild(title);
+            link.appendChild(goal);
+
             if (completed.includes(id)) {
                 link.classList.add('completed-challenge');
             }
@@ -264,7 +542,39 @@ function initChallengePage() {
     ctx = canvas.getContext('2d');
 
     const urlParams = new URLSearchParams(window.location.search);
-    const challengeId = urlParams.get('id') || 'G1_S1C1';
+    const projectId = urlParams.get('project');
+    const stepParam = urlParams.get('step');
+    const requestedChallengeId = urlParams.get('id');
+
+    let challengeId = requestedChallengeId || 'G1_S1C1';
+    state.projectContext = null;
+
+    if (projectId) {
+        const project = getProject(projectId);
+        const stepIndex = Math.max(0, parseInt(stepParam || '0', 10) || 0);
+        if (project && Array.isArray(project.steps) && project.steps[stepIndex]) {
+            challengeId = project.steps[stepIndex];
+            state.projectContext = { projectId, stepIndex };
+        }
+    }
+
+    const banner = document.getElementById('project-banner');
+    if (banner) {
+        if (state.projectContext) {
+            const project = getProject(state.projectContext.projectId);
+            const titleEl = document.getElementById('project-banner-title');
+            const subEl = document.getElementById('project-banner-sub');
+            if (titleEl) titleEl.textContent = project ? project.title : 'Project';
+            if (subEl) {
+                const total = project && Array.isArray(project.steps) ? project.steps.length : 0;
+                subEl.textContent = total ? `Step ${state.projectContext.stepIndex + 1} of ${total}` : '';
+            }
+            banner.style.display = 'flex';
+        } else {
+            banner.style.display = 'none';
+        }
+    }
+
     loadChallenge(challengeId);
     initLayoutSwitcher();
     initModal();
@@ -283,7 +593,7 @@ function parseAndExecute(code) {
     clearError();
     const lines = code.split('\n');
     try {
-        executeLines(lines);
+        executeLines(lines, {}, createExecBudget());
         render();
         checkWinCondition();
     } catch (e) {
@@ -307,12 +617,208 @@ function clearError() {
     }
 }
 
-function executeLines(lines, argsMap = {}) {
+const EXEC_LIMITS = {
+    maxSteps: 6000,
+    maxRepeat: 2000,
+    maxLineLength: 300
+};
+
+function createExecBudget() {
+    return { stepsRemaining: EXEC_LIMITS.maxSteps };
+}
+
+function consumeSteps(budget, count = 1) {
+    if (!budget) return;
+    budget.stepsRemaining -= count;
+    if (budget.stepsRemaining < 0) {
+        throw new Error("Your code ran too long. Try smaller loops or fewer steps.");
+    }
+}
+
+function coerceValue(value) {
+    const raw = String(value ?? '').trim();
+    const unquoted = raw.replace(/^["']|["']$/g, '');
+    if (/^-?\d+(\.\d+)?$/.test(unquoted)) return Number(unquoted);
+    if (unquoted === 'true') return true;
+    if (unquoted === 'false') return false;
+    return unquoted;
+}
+
+function tokenizeCondition(input) {
+    const tokens = [];
+    let i = 0;
+
+    const push = (type, value) => tokens.push({ type, value });
+
+    while (i < input.length) {
+        const ch = input[i];
+        if (/\s/.test(ch)) {
+            i++;
+            continue;
+        }
+
+        if (/[0-9.]/.test(ch)) {
+            let j = i;
+            while (j < input.length && /[0-9.]/.test(input[j])) j++;
+            const numStr = input.slice(i, j);
+            if (!/^\d+(\.\d+)?$/.test(numStr)) {
+                throw new Error("I couldn't read that number in your if statement.");
+            }
+            push('number', Number(numStr));
+            i = j;
+            continue;
+        }
+
+        if (/[A-Za-z_]/.test(ch)) {
+            let j = i;
+            while (j < input.length && /[A-Za-z0-9_]/.test(input[j])) j++;
+            const word = input.slice(i, j);
+            if (word === 'true') push('boolean', true);
+            else if (word === 'false') push('boolean', false);
+            else push('ident', word);
+            i = j;
+            continue;
+        }
+
+        const two = input.slice(i, i + 2);
+        if (['&&', '||', '<=', '>=', '==', '!='].includes(two)) {
+            push('op', two);
+            i += 2;
+            continue;
+        }
+
+        if (['+', '-', '*', '/', '(', ')', '<', '>'].includes(ch)) {
+            push(ch === '(' || ch === ')' ? 'paren' : 'op', ch);
+            i += 1;
+            continue;
+        }
+
+        throw new Error("I found a symbol in your if statement that I don't understand.");
+    }
+
+    return tokens;
+}
+
+function evaluateCondition(conditionStr, vars) {
+    const tokens = tokenizeCondition(conditionStr);
+    let pos = 0;
+
+    const peek = () => tokens[pos];
+    const next = () => tokens[pos++];
+    const matchOp = (op) => peek() && peek().type === 'op' && peek().value === op;
+
+    const asNumber = (v) => {
+        if (typeof v === 'number') return v;
+        if (typeof v === 'boolean') return v ? 1 : 0;
+        throw new Error("That math in your if statement needs numbers.");
+    };
+
+    const asBoolean = (v) => {
+        if (typeof v === 'boolean') return v;
+        if (typeof v === 'number') return v !== 0;
+        throw new Error("That logic in your if statement needs true/false.");
+    };
+
+    const parsePrimary = () => {
+        const t = next();
+        if (!t) throw new Error("Your if statement looks incomplete.");
+        if (t.type === 'number' || t.type === 'boolean') return t.value;
+        if (t.type === 'ident') {
+            if (!vars || !(t.value in vars)) throw new Error(`I don't know the value of '${t.value}' yet.`);
+            return vars[t.value];
+        }
+        if (t.type === 'paren' && t.value === '(') {
+            const v = parseOr();
+            const close = next();
+            if (!close || close.type !== 'paren' || close.value !== ')') throw new Error("Missing ')' in your if statement.");
+            return v;
+        }
+        throw new Error("I couldn't understand that part of your if statement.");
+    };
+
+    const parseUnary = () => {
+        if (matchOp('-')) {
+            next();
+            return -asNumber(parseUnary());
+        }
+        return parsePrimary();
+    };
+
+    const parseMul = () => {
+        let left = parseUnary();
+        while (peek() && peek().type === 'op' && ['*', '/'].includes(peek().value)) {
+            const op = next().value;
+            const right = parseUnary();
+            left = op === '*' ? asNumber(left) * asNumber(right) : asNumber(left) / asNumber(right);
+        }
+        return left;
+    };
+
+    const parseAdd = () => {
+        let left = parseMul();
+        while (peek() && peek().type === 'op' && ['+', '-'].includes(peek().value)) {
+            const op = next().value;
+            const right = parseMul();
+            left = op === '+' ? asNumber(left) + asNumber(right) : asNumber(left) - asNumber(right);
+        }
+        return left;
+    };
+
+    const parseRel = () => {
+        let left = parseAdd();
+        while (peek() && peek().type === 'op' && ['<', '>', '<=', '>='].includes(peek().value)) {
+            const op = next().value;
+            const right = parseAdd();
+            if (op === '<') left = asNumber(left) < asNumber(right);
+            else if (op === '>') left = asNumber(left) > asNumber(right);
+            else if (op === '<=') left = asNumber(left) <= asNumber(right);
+            else left = asNumber(left) >= asNumber(right);
+        }
+        return left;
+    };
+
+    const parseEq = () => {
+        let left = parseRel();
+        while (peek() && peek().type === 'op' && ['==', '!='].includes(peek().value)) {
+            const op = next().value;
+            const right = parseRel();
+            left = op === '==' ? left === right : left !== right;
+        }
+        return left;
+    };
+
+    const parseAnd = () => {
+        let left = parseEq();
+        while (matchOp('&&')) {
+            next();
+            const right = parseEq();
+            left = asBoolean(left) && asBoolean(right);
+        }
+        return left;
+    };
+
+    const parseOr = () => {
+        let left = parseAnd();
+        while (matchOp('||')) {
+            next();
+            const right = parseAnd();
+            left = asBoolean(left) || asBoolean(right);
+        }
+        return left;
+    };
+
+    const result = parseOr();
+    if (pos !== tokens.length) throw new Error("I couldn't understand all of your if statement.");
+    return asBoolean(result);
+}
+
+function executeLines(lines, argsMap = {}, budget) {
     const commandRegex = /(\w+)\s*\(\s*(.*)\s*\)/;
     const repeatStartRegex = /repeat\s+(\d+)\s*{/;
     const ifStartRegex = /if\s*\((.+)\)\s*{/;
     const functionStartRegex = /function\s+(\w+)\s*\((.*)\)\s*{/;
     const varRegex = /var\s+(\w+)\s*=\s*(.*)/;
+    const elseStartRegex = /else\s*{/;
     const endBlockRegex = /}/;
 
     // Pre-pass to define functions?
@@ -322,6 +828,8 @@ function executeLines(lines, argsMap = {}) {
     for (let i = 0; i < lines.length; i++) {
         let line = lines[i].trim();
         if (!line) continue;
+        if (line.length > EXEC_LIMITS.maxLineLength) throw new Error("That line is too long. Try breaking it into smaller steps.");
+        consumeSteps(budget, 1);
 
         // Check for Variable Definition
         const varMatch = line.match(varRegex);
@@ -332,7 +840,7 @@ function executeLines(lines, argsMap = {}) {
             if (argsMap[value] !== undefined) value = argsMap[value];
             else if (state.vars[value] !== undefined) value = state.vars[value];
 
-            state.vars[varName] = value;
+            state.vars[varName] = coerceValue(value);
             continue;
         }
 
@@ -348,7 +856,7 @@ function executeLines(lines, argsMap = {}) {
             while (i < lines.length && depth > 0) {
                 let innerLine = lines[i];
                 // Check for nested blocks (loops or other functions? Nested functions not supported yet)
-                if (innerLine.trim().match(repeatStartRegex) || innerLine.trim().match(functionStartRegex)) {
+                if (innerLine.trim().match(repeatStartRegex) || innerLine.trim().match(ifStartRegex) || innerLine.trim().match(functionStartRegex)) {
                     depth++;
                 } else if (innerLine.trim().match(endBlockRegex)) {
                     depth--;
@@ -367,6 +875,7 @@ function executeLines(lines, argsMap = {}) {
         const repeatMatch = line.match(repeatStartRegex);
         if (repeatMatch) {
             const count = parseInt(repeatMatch[1], 10);
+            if (count > EXEC_LIMITS.maxRepeat) throw new Error("That repeat number is too big. Try a smaller loop.");
             const blockLines = [];
             let depth = 1;
             i++;
@@ -386,7 +895,7 @@ function executeLines(lines, argsMap = {}) {
             }
 
             for (let k = 0; k < count; k++) {
-                executeLines(blockLines, argsMap);
+                executeLines(blockLines, argsMap, budget);
             }
             continue;
         }
@@ -394,31 +903,16 @@ function executeLines(lines, argsMap = {}) {
         // Check for If Condition
         const ifMatch = line.match(ifStartRegex);
         if (ifMatch) {
-            let conditionStr = ifMatch[1];
-            // Resolve variables in condition (simple regex replace for known vars)
-            // A proper parser would be better, but we'll do simple substitution for now.
-            Object.keys(state.vars).forEach(v => {
-                const regex = new RegExp(`\\b${v}\\b`, 'g');
-                conditionStr = conditionStr.replace(regex, state.vars[v]);
-            });
-            Object.keys(argsMap).forEach(v => {
-                const regex = new RegExp(`\\b${v}\\b`, 'g');
-                conditionStr = conditionStr.replace(regex, argsMap[v]);
-            });
+            const conditionStr = ifMatch[1];
+            const conditionVars = {
+                x: state.turtle.x,
+                y: state.turtle.y,
+                angle: state.turtle.angle,
+                ...state.vars,
+                ...argsMap
+            };
 
-            // Safe eval (sort of) - only allow math and comparisons
-            // NOTE: This is a security risk in a real app, but acceptable for this contained sandbox environment?
-            // Let's implement a safer evaluator for numbers and basic operators.
-            let conditionResult = false;
-            try {
-                // Sanitize: allow numbers, operators, parens, true/false
-                if (/^[\d\s+\-*/<>=!&|()truefalse.]+$/.test(conditionStr)) {
-                    // eslint-disable-next-line no-new-func
-                    conditionResult = new Function('return ' + conditionStr)();
-                }
-            } catch (e) {
-                console.warn("Condition parse error", e);
-            }
+            const conditionResult = evaluateCondition(conditionStr, conditionVars);
 
             const blockLines = [];
             let depth = 1;
@@ -438,9 +932,30 @@ function executeLines(lines, argsMap = {}) {
                 }
             }
 
-            if (conditionResult) {
-                executeLines(blockLines, argsMap);
+            // Optional else { ... }
+            let elseLines = null;
+            let j = i + 1;
+            while (j < lines.length && !lines[j].trim()) j++;
+            if (j < lines.length && lines[j].trim().match(elseStartRegex)) {
+                elseLines = [];
+                i = j + 1;
+                depth = 1;
+                while (i < lines.length && depth > 0) {
+                    const innerLine = lines[i];
+                    if (innerLine.trim().match(repeatStartRegex) || innerLine.trim().match(ifStartRegex) || innerLine.trim().match(functionStartRegex)) {
+                        depth++;
+                    } else if (innerLine.trim().match(endBlockRegex)) {
+                        depth--;
+                    }
+                    if (depth > 0) {
+                        elseLines.push(innerLine);
+                        i++;
+                    }
+                }
             }
+
+            if (conditionResult) executeLines(blockLines, argsMap, budget);
+            else if (elseLines) executeLines(elseLines, argsMap, budget);
             continue;
         }
 
@@ -459,13 +974,21 @@ function executeLines(lines, argsMap = {}) {
                 args = String(state.vars[args]);
             }
 
-            const cleanArgs = args.replace(/^["']|["']$/g, '');
+            const cleanArgs = coerceValue(args);
 
-            if (lowerCommand === 'forward') forward(parseInt(cleanArgs, 10));
-            else if (lowerCommand === 'turn') turn(parseInt(cleanArgs, 10));
+            if (lowerCommand === 'forward') {
+                const n = Number(cleanArgs);
+                if (Number.isNaN(n)) throw new Error("forward(...) needs a number.");
+                forward(n);
+            }
+            else if (lowerCommand === 'turn') {
+                const n = Number(cleanArgs);
+                if (Number.isNaN(n)) throw new Error("turn(...) needs a number.");
+                turn(n);
+            }
             else if (lowerCommand === 'penup') penUp();
             else if (lowerCommand === 'pendown') penDown();
-            else if (lowerCommand === 'pencolor') penColor(cleanArgs);
+            else if (lowerCommand === 'pencolor') penColor(String(cleanArgs));
             else if (state.functions[command]) {
                 // Execute User Function
                 const funcDef = state.functions[command];
@@ -474,17 +997,17 @@ function executeLines(lines, argsMap = {}) {
 
                 if (Array.isArray(funcDef)) {
                     // Fallback if somehow old format persists (shouldn't happen with clean reload)
-                    executeLines(funcDef, argsMap);
+                    executeLines(funcDef, argsMap, budget);
                 } else {
-                    const callArgs = cleanArgs.split(',').map(a => a.trim());
+                    const callArgs = String(cleanArgs).split(',').map(a => a.trim());
                     const newArgsMap = {};
                     funcDef.params.forEach((param, index) => {
                         // resolve argument if it's a variable in current scope
                         let val = callArgs[index];
                         if (argsMap[val] !== undefined) val = argsMap[val];
-                        newArgsMap[param] = val;
+                        newArgsMap[param] = coerceValue(val);
                     });
-                    executeLines(funcDef.lines, newArgsMap);
+                    executeLines(funcDef.lines, newArgsMap, budget);
                 }
             }
             else {
@@ -498,6 +1021,242 @@ function executeLines(lines, argsMap = {}) {
     }
 }
 
+function findNextProjectStepIndex(project, progressEntry) {
+    const completed = (progressEntry && Array.isArray(progressEntry.completedSteps)) ? progressEntry.completedSteps : [];
+    for (let i = 0; i < project.steps.length; i++) {
+        if (!completed.includes(i)) return i;
+    }
+    return Math.max(0, project.steps.length - 1);
+}
+
+function initProjectsPage() {
+    const list = document.getElementById('project-list');
+    if (!list) return;
+    list.innerHTML = '';
+
+    const projects = Array.isArray(ALL_DATA.projects) ? ALL_DATA.projects : [];
+    const pp = getProjectProgress();
+
+    projects.forEach(project => {
+        const entry = pp[project.id] || { completedSteps: [], rewardedAt: null };
+        const completedCount = Array.isArray(entry.completedSteps) ? entry.completedSteps.length : 0;
+        const total = Array.isArray(project.steps) ? project.steps.length : 0;
+        const nextIndex = findNextProjectStepIndex(project, entry);
+
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const h = document.createElement('h3');
+        h.textContent = project.title;
+
+        const p = document.createElement('p');
+        p.textContent = project.description || '';
+
+        const meta = document.createElement('div');
+        meta.className = 'card-meta';
+        meta.textContent = total ? `Progress: ${Math.min(completedCount, total)} / ${total}` : 'Progress: 0 / 0';
+
+        const actions = document.createElement('div');
+        actions.className = 'card-actions';
+
+        const primary = document.createElement('a');
+        primary.className = 'button';
+        primary.href = `challenge.html?project=${encodeURIComponent(project.id)}&step=${nextIndex}`;
+        primary.textContent = completedCount >= total && total ? 'Replay' : (completedCount ? 'Continue' : 'Start');
+
+        const reward = document.createElement('span');
+        reward.className = 'pill';
+        const rewardPoints = project.reward && typeof project.reward.points === 'number' ? project.reward.points : 0;
+        reward.textContent = rewardPoints ? `Reward: ${rewardPoints} pts` : 'Reward: items';
+
+        actions.appendChild(primary);
+        actions.appendChild(reward);
+
+        card.appendChild(h);
+        card.appendChild(p);
+        card.appendChild(meta);
+        card.appendChild(actions);
+
+        list.appendChild(card);
+    });
+}
+
+function setMessage(el, text, kind = 'info') {
+    if (!el) return;
+    el.textContent = text;
+    el.style.display = 'block';
+    el.style.padding = '10px';
+    el.style.borderRadius = '8px';
+    el.style.border = kind === 'error' ? '1px solid #d8000c' : '1px solid var(--light-gray)';
+    el.style.background = kind === 'error' ? '#ffdddd' : '#ffffff';
+    el.style.color = kind === 'error' ? '#d8000c' : 'var(--text-color)';
+}
+
+function initShopPage() {
+    const list = document.getElementById('shop-list');
+    const balanceEl = document.getElementById('shop-balance');
+    const filterEl = document.getElementById('shop-filter');
+    const messageEl = document.getElementById('shop-message');
+    if (!list || !balanceEl || !filterEl) return;
+
+    const render = () => {
+        const wallet = getWallet();
+        balanceEl.textContent = String(wallet.points);
+        list.innerHTML = '';
+
+        const filter = filterEl.value;
+        const items = getShopItems().filter(item => filter === 'all' || item.slot === filter);
+
+        items.forEach(item => {
+            const owned = isOwned(item.id);
+            const card = document.createElement('div');
+            card.className = 'card';
+
+            const emoji = document.createElement('div');
+            emoji.className = 'shop-item-emoji';
+            emoji.textContent = item.emoji || '🎁';
+
+            const h = document.createElement('h3');
+            h.textContent = item.name;
+
+            const p = document.createElement('p');
+            p.textContent = item.description || '';
+
+            const meta = document.createElement('div');
+            meta.className = 'card-meta';
+            meta.textContent = `${item.cost} pts • ${item.slot}`;
+
+            const actions = document.createElement('div');
+            actions.className = 'card-actions';
+
+            if (!owned) {
+                const buy = document.createElement('button');
+                buy.className = 'button';
+                buy.type = 'button';
+                buy.textContent = `Buy (${item.cost})`;
+                buy.disabled = getWallet().points < item.cost;
+                buy.onclick = () => {
+                    if (!spendPoints(item.cost)) {
+                        setMessage(messageEl, "Not enough points yet. Complete more challenges!", 'error');
+                        return;
+                    }
+                    grantItem(item.id);
+                    setMessage(messageEl, `Purchased: ${item.name}`, 'info');
+                    render();
+                    updateHeaderStatus();
+                };
+                actions.appendChild(buy);
+            } else {
+                const ownedPill = document.createElement('span');
+                ownedPill.className = 'pill';
+                ownedPill.textContent = 'Owned';
+
+                const equip = document.createElement('button');
+                equip.className = 'button button-secondary';
+                equip.type = 'button';
+                equip.textContent = 'Equip';
+                equip.onclick = () => {
+                    const eq = getEquipped();
+                    if (item.slot) eq[item.slot] = item.id;
+                    setEquipped(eq);
+                    setMessage(messageEl, `Equipped: ${item.name}`, 'info');
+                    render();
+                };
+
+                actions.appendChild(ownedPill);
+                actions.appendChild(equip);
+            }
+
+            card.appendChild(emoji);
+            card.appendChild(h);
+            card.appendChild(p);
+            card.appendChild(meta);
+            card.appendChild(actions);
+            list.appendChild(card);
+        });
+    };
+
+    filterEl.onchange = () => render();
+    render();
+}
+
+function renderAvatarPreview() {
+    const eq = getEquipped();
+    const bg = getShopItem(eq.background);
+    const hat = getShopItem(eq.hat);
+    const shell = getShopItem(eq.shell);
+
+    const bgEl = document.getElementById('avatar-bg');
+    const hatEl = document.getElementById('avatar-hat');
+    const shellEl = document.getElementById('avatar-shell');
+
+    if (bgEl) bgEl.textContent = bg ? bg.emoji : '⬜';
+    if (hatEl) hatEl.textContent = hat ? hat.emoji : '➖';
+    if (shellEl) shellEl.textContent = shell ? shell.emoji : '🟩';
+}
+
+function populateEquipSelect(selectEl, slot) {
+    if (!selectEl) return;
+    selectEl.innerHTML = '';
+    const eq = getEquipped();
+    const items = getShopItems().filter(i => i.slot === slot && isOwned(i.id));
+    items.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item.id;
+        opt.textContent = `${item.emoji} ${item.name}`;
+        selectEl.appendChild(opt);
+    });
+    if (eq[slot]) selectEl.value = eq[slot];
+}
+
+function initProfilePage() {
+    const nameEl = document.getElementById('profile-name');
+    const saveProfileBtn = document.getElementById('save-profile-btn');
+    const saveEquipBtn = document.getElementById('save-equipment-btn');
+    const resetBtn = document.getElementById('reset-progress-btn');
+    const messageEl = document.getElementById('profile-message');
+
+    if (!nameEl || !saveProfileBtn || !saveEquipBtn || !resetBtn) return;
+
+    const profile = getProfile();
+    nameEl.value = profile.displayName || '';
+
+    const bgSelect = document.getElementById('equip-background');
+    const hatSelect = document.getElementById('equip-hat');
+    const shellSelect = document.getElementById('equip-shell');
+
+    populateEquipSelect(bgSelect, 'background');
+    populateEquipSelect(hatSelect, 'hat');
+    populateEquipSelect(shellSelect, 'shell');
+    renderAvatarPreview();
+
+    saveProfileBtn.onclick = () => {
+        const next = { ...getProfile(), displayName: String(nameEl.value || '').trim().slice(0, 24) || 'Coder Turtle' };
+        setProfile(next);
+        setMessage(messageEl, "Saved profile.", 'info');
+    };
+
+    saveEquipBtn.onclick = () => {
+        const eq = getEquipped();
+        if (bgSelect && bgSelect.value) eq.background = bgSelect.value;
+        if (hatSelect && hatSelect.value) eq.hat = hatSelect.value;
+        if (shellSelect && shellSelect.value) eq.shell = shellSelect.value;
+        setEquipped(eq);
+        renderAvatarPreview();
+        setMessage(messageEl, "Equipped your items.", 'info');
+    };
+
+    resetBtn.onclick = () => {
+        const ok = confirm("Reset challenges and project progress on this device? Your avatar items stay.");
+        if (!ok) return;
+        setCompletedChallenges([]);
+        setProjectProgress({});
+        const wallet = getWallet();
+        setWallet({ points: 0, lifetimePoints: wallet.lifetimePoints });
+        setMessage(messageEl, "Progress reset.", 'info');
+    };
+}
+
 // --- Main Execution ---
 function main() {
     // Wait for DOM content loaded if script runs before DOM
@@ -506,11 +1265,19 @@ function main() {
         return;
     }
     ALL_DATA = window.ALL_DATA;
+    ensureStarterData();
+    updateHeaderStatus();
 
     if (document.getElementById('challenge-selection')) {
         initIndexPage();
     } else if (document.querySelector('.challenge-layout')) {
         initChallengePage();
+    } else if (document.getElementById('project-list')) {
+        initProjectsPage();
+    } else if (document.getElementById('shop-list')) {
+        initShopPage();
+    } else if (document.getElementById('profile-name')) {
+        initProfilePage();
     }
 }
 

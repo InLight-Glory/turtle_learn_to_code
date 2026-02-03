@@ -1,0 +1,9 @@
+/* Morning-Tranquil theme (variable overrides only). */
+
+:root {
+    --primary-color: #60a5fa;   /* calm blue */
+    --secondary-color: #34d399; /* soft mint */
+    --background-color: #f8fafc;/* cool white */
+    --text-color: #0f172a;      /* slate-900 */
+    --light-gray: #e2e8f0;      /* slate-200 */
+}

@@ -1,0 +1,9 @@
+/* Morning-Ocean theme (variable overrides only). */
+
+:root {
+    --primary-color: #1d9bf0;   /* ocean blue */
+    --secondary-color: #2dd4bf; /* seafoam */
+    --background-color: #f0f9ff;/* sky tint */
+    --text-color: #0f172a;      /* slate-900 */
+    --light-gray: #bae6fd;      /* soft border */
+}

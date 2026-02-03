@@ -1,0 +1,9 @@
+/* Midnight-Ocean theme (variable overrides only). */
+
+:root {
+    --primary-color: #38bdf8;   /* bright cyan-blue */
+    --secondary-color: #22c55e; /* bioluminescent green accent */
+    --background-color: #020617;/* deep navy */
+    --text-color: #e2e8f0;      /* slate-200 */
+    --light-gray: #1e293b;      /* slate-800 */
+}

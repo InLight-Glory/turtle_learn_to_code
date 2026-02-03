@@ -2,6 +2,8 @@
 
 This project is a static web application built with HTML, CSS, and vanilla JavaScript. It requires no backend server, making it extremely easy to host.
 
+Note: Progress, points, and avatar data are saved in the browser's `localStorage` on each device.
+
 ## Recommended Hosting: GitHub Pages
 
 GitHub Pages is the simplest way to host this project directly from your GitHub repository for free.

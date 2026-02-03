@@ -440,8 +440,55 @@ const DATA_LAYOUTS = {
     }
 };
 
+const DATA_SHOP = {
+    currencyName: "Points",
+    items: [
+        { id: "bg_none", name: "Plain Background", slot: "background", cost: 0, emoji: "⬜", description: "Keep it simple." },
+        { id: "bg_sky", name: "Sky Background", slot: "background", cost: 40, emoji: "🌤️", description: "A bright day for coding." },
+        { id: "bg_space", name: "Space Background", slot: "background", cost: 75, emoji: "🌌", description: "Launch into loops." },
+
+        { id: "hat_none", name: "No Hat", slot: "hat", cost: 0, emoji: "➖", description: "No hat equipped." },
+        { id: "hat_cap", name: "Cool Cap", slot: "hat", cost: 35, emoji: "🧢", description: "For challenge champions." },
+        { id: "hat_top", name: "Top Hat", slot: "hat", cost: 80, emoji: "🎩", description: "Elegant problem-solver vibes." },
+        { id: "hat_crown", name: "Crown", slot: "hat", cost: 150, emoji: "👑", description: "Earned by hard work." },
+
+        { id: "shell_none", name: "Default Shell", slot: "shell", cost: 0, emoji: "🟩", description: "Classic turtle style." },
+        { id: "shell_gold", name: "Golden Shell", slot: "shell", cost: 120, emoji: "🟨", description: "Shiny rewards for persistence." },
+        { id: "shell_rainbow", name: "Rainbow Shell", slot: "shell", cost: 200, emoji: "🌈", description: "Color your journey." }
+    ],
+    starterInventory: ["bg_none", "hat_none", "shell_none"]
+};
+
+const DATA_PROJECTS = {
+    projects: [
+        {
+            id: "project_house_builder",
+            title: "Project: House Builder",
+            description: "Use functions to draw a house, step by step.",
+            steps: ["G3_C1", "G3_C2", "G3_C3"],
+            reward: { points: 120, grantItemIds: ["bg_sky"] }
+        },
+        {
+            id: "project_spiral_artist",
+            title: "Project: Spiral Artist",
+            description: "Use variables and loops to draw a growing spiral.",
+            steps: ["G4_C1", "G4_C2"],
+            reward: { points: 100, grantItemIds: ["shell_gold"] }
+        },
+        {
+            id: "project_decision_designer",
+            title: "Project: Decision Designer",
+            description: "Learn conditionals by creating art that changes based on rules.",
+            steps: ["G5_C1", "G5_C3"],
+            reward: { points: 140, grantItemIds: ["hat_cap"] }
+        }
+    ]
+};
+
 // Initialize global data
 window.ALL_DATA = {
     ...DATA_CHALLENGES,
-    layouts: DATA_LAYOUTS
+    layouts: DATA_LAYOUTS,
+    shop: DATA_SHOP,
+    projects: DATA_PROJECTS.projects
 };

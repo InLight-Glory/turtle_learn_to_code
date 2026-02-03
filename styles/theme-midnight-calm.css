@@ -1,0 +1,9 @@
+/* Midnight-Calm theme (variable overrides only). */
+
+:root {
+    --primary-color: #818cf8;   /* indigo */
+    --secondary-color: #22d3ee; /* cyan */
+    --background-color: #0b1020;/* deep blue */
+    --text-color: #e2e8f0;      /* slate-200 */
+    --light-gray: #1e293b;      /* slate-800 */
+}

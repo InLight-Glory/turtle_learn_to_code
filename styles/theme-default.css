@@ -1,0 +1,11 @@
+/* Default theme (matches current site colors).
+   Intended to be swapped via a future style/theme dropdown.
+*/
+
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #f1c40f;
+    --background-color: #f8f9fa;
+    --text-color: #333;
+    --light-gray: #ecf0f1;
+}

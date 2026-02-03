@@ -1,0 +1,9 @@
+/* Midnight-Forest theme (variable overrides only). */
+
+:root {
+    --primary-color: #22c55e;   /* glowing green */
+    --secondary-color: #facc15; /* firefly gold */
+    --background-color: #0b1220;/* deep blue-green */
+    --text-color: #e5e7eb;      /* gray-200 */
+    --light-gray: #1f2937;      /* gray-800 */
+}
