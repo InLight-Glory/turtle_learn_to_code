@@ -1,0 +1,9 @@
+/* High contrast theme (variable overrides only). */
+
+:root {
+    --primary-color: #000000;
+    --secondary-color: #ffcc00;
+    --background-color: #ffffff;
+    --text-color: #000000;
+    --light-gray: #000000; /* borders become black */
+}

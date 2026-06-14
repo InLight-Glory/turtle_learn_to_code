@@ -1,0 +1,9 @@
+/* Midnight-Sunset theme (variable overrides only). */
+
+:root {
+    --primary-color: #a78bfa;   /* violet */
+    --secondary-color: #fb7185; /* sunset pink */
+    --background-color: #0a0612;/* near-black purple */
+    --text-color: #f1f5f9;      /* slate-100 */
+    --light-gray: #2b1b3a;      /* muted purple border */
+}

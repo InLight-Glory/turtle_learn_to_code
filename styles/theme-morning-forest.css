@@ -1,0 +1,9 @@
+/* Morning-Forest theme (variable overrides only). */
+
+:root {
+    --primary-color: #16a34a;   /* fresh leaf green */
+    --secondary-color: #84cc16; /* lime highlight */
+    --background-color: #f7fee7;/* pale green */
+    --text-color: #052e16;      /* deep forest */
+    --light-gray: #d9f99d;      /* soft border */
+}

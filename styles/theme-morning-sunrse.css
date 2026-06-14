@@ -1,0 +1,11 @@
+/* Morning-Sunrse theme (variable overrides only).
+   Note: file name matches requested spelling: Sunrse.
+*/
+
+:root {
+    --primary-color: #fb7185;   /* warm pink */
+    --secondary-color: #f59e0b; /* sunrise amber */
+    --background-color: #fff7ed;/* peachy white */
+    --text-color: #3b1d0f;      /* warm brown */
+    --light-gray: #fed7aa;      /* soft border */
+}

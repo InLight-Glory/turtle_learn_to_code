@@ -1,0 +1,9 @@
+/* Dark theme (variable overrides only). */
+
+:root {
+    --primary-color: #7cb9ff;
+    --secondary-color: #ffd166;
+    --background-color: #0f172a; /* slate-900 */
+    --text-color: #e5e7eb;       /* gray-200 */
+    --light-gray: #334155;       /* slate-700 (used for borders) */
+}
